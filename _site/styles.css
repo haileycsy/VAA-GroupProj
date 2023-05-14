@@ -1,1 +1,24 @@
 /* css styles */
+
+/* Navbar Logo */
+
+.navbar-brand {
+  font-family: 'Tilt Neon', cursive;
+}
+
+.navbar-brand > img {
+  max-height: 50px;
+}
+
+@media (max-width: 1060px) and (min-width: 991.98px) {
+
+#navbarCollapse ul:last-of-type a.nav-link {
+  padding-left: .25em;
+  padding-right: .25em;
+}
+
+.navbar {
+  margin-left: .1em;
+}
+}
+

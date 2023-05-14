@@ -3,17 +3,31 @@ project:
 
 website:
   title: "VAA-GroupProj"
+  image: "images/shoal.png"
+  favicon: "images/fishbone-icon.png"
   navbar:
-    left:
-      - href: index.qmd
-        text: Home
-      - about.qmd
-
+    logo: "images/shoal.png"
+    title: false
+    collapse-below: lg
+    search: true
+    right:
+      - text: "Home"
+        menu: 
+          - text: "Home"
+            href: index.qmd
+          - text: "About the Team"
+            href: about.html
+            
 format:
   html:
-    theme: cosmo
-    css: styles.css
     toc: true
+    theme: 
+      - journal
+      - theme.scss
+    highlight-style: tango
+    code-copy: hover
+    code-overflow: wrap
+    css: styles.css
 
 editor: visual
 

@@ -1,11 +1,11 @@
 ---
-title: "VAA-GroupProj"
+title: "VAST Challenge"
+title-block-banner: true
+toc: true
 ---
 
-This is a Quarto website.
+# Text text 
 
-To learn more about Quarto websites visit <https://quarto.org/docs/websites>.
+## Test text text
 
-```{r}
-1 + 1
-```
+### text text text text

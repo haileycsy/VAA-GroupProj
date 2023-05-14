@@ -9,8 +9,15 @@
   {
     "objectID": "index.html",
     "href": "index.html",
-    "title": "VAA-GroupProj",
+    "title": "VAST Challenge",
     "section": "",
-    "text": "This is a Quarto website.\nTo learn more about Quarto websites visit https://quarto.org/docs/websites.\n\n1 + 1\n\n[1] 2"
+    "text": "Text text text"
+  },
+  {
+    "objectID": "index.html#some-text",
+    "href": "index.html#some-text",
+    "title": "VAST Challenge",
+    "section": "Some text",
+    "text": "Some text\n\nrolldown::scrollama_setup(\n  list(step = '.level1', offset = .2, debug = TRUE)\n)"
   }
 ]
