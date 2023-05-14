@@ -5,19 +5,5 @@
     "title": "About",
     "section": "",
     "text": "About this site\n\n1 + 1\n\n[1] 2"
-  },
-  {
-    "objectID": "index.html",
-    "href": "index.html",
-    "title": "VAST Challenge",
-    "section": "",
-    "text": "Text text text"
-  },
-  {
-    "objectID": "index.html#some-text",
-    "href": "index.html#some-text",
-    "title": "VAST Challenge",
-    "section": "Some text",
-    "text": "Some text\n\nrolldown::scrollama_setup(\n  list(step = '.level1', offset = .2, debug = TRUE)\n)"
   }
 ]
