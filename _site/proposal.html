@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>VAA-GroupProj - Finding NEMO</title>
+<title>VAA-GroupProj - VAST Mini-Challenge 3: Proposal</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -40,6 +40,8 @@ ul.task-list li input[type="checkbox"] {
 <script src="site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
 <link href="site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/quarto-contrib/fontawesome6-0.1.0/all.css" rel="stylesheet">
+<link href="site_libs/quarto-contrib/fontawesome6-0.1.0/latex-fontsize.css" rel="stylesheet">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -59,6 +61,9 @@ ul.task-list li input[type="checkbox"] {
     "search-submit-button-title": "Submit"
   }
 }</script>
+<script src="site_libs/quarto-diagram/mermaid.min.js"></script>
+<script src="site_libs/quarto-diagram/mermaid-init.js"></script>
+<link href="site_libs/quarto-diagram/mermaid.css" rel="stylesheet">
 
 
 <link rel="stylesheet" href="styles.css">
@@ -96,7 +101,7 @@ ul.task-list li input[type="checkbox"] {
     </ul>
   </li>
   <li class="nav-item">
-    <a class="nav-link" href="./proposal.html">
+    <a class="nav-link active" href="./proposal.html" aria-current="page">
  <span class="menu-text">Proposal</span></a>
   </li>  
 </ul>
@@ -109,7 +114,7 @@ ul.task-list li input[type="checkbox"] {
 <header id="title-block-header" class="quarto-title-block default page-columns page-full">
   <div class="quarto-title-banner page-columns page-full">
     <div class="quarto-title column-body">
-      <h1 class="title">Finding NEMO</h1>
+      <h1 class="title">VAST Mini-Challenge 3: Proposal</h1>
                       </div>
   </div>
     
@@ -126,7 +131,16 @@ ul.task-list li input[type="checkbox"] {
 <!-- sidebar -->
 <!-- margin-sidebar -->
     <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
-        
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#fa-fish-fins-project-overview" id="toc-fa-fish-fins-project-overview" class="nav-link active" data-scroll-target="#fa-fish-fins-project-overview"><i class="fa-solid fa-fish-fins" aria-label="fish-fins"></i> Project Overview</a></li>
+  <li><a href="#fa-fish-fins-project-objectives" id="toc-fa-fish-fins-project-objectives" class="nav-link" data-scroll-target="#fa-fish-fins-project-objectives"><i class="fa-solid fa-fish-fins" aria-label="fish-fins"></i> Project Objectives</a></li>
+  <li><a href="#fa-fish-fins-proposed-methodology" id="toc-fa-fish-fins-proposed-methodology" class="nav-link" data-scroll-target="#fa-fish-fins-proposed-methodology"><i class="fa-solid fa-fish-fins" aria-label="fish-fins"></i> Proposed Methodology</a></li>
+  <li><a href="#fa-fish-fins-shiny-app" id="toc-fa-fish-fins-shiny-app" class="nav-link" data-scroll-target="#fa-fish-fins-shiny-app"><i class="fa-solid fa-fish-fins" aria-label="fish-fins"></i> Shiny App</a></li>
+  </ul>
+</nav>
     </div>
 <!-- main -->
 <main class="content quarto-banner-title-block" id="quarto-document-content">
@@ -134,8 +148,58 @@ ul.task-list li input[type="checkbox"] {
 
 
 
+<p><font size="6"> <strong>Fishy Business</strong></font></p>
+<section id="fa-fish-fins-project-overview" class="level1">
+<h1><i class="fa-solid fa-fish-fins" aria-label="fish-fins"></i> Project Overview</h1>
+<p>FishEye International, a non-profit focused on countering illegal, unreported, and unregulated (IUU) fishing, has been given access to an international finance corporation’s database on fishing related companies. In the past, FishEye has determined that companies with anomalous structures are far more likely to be involved in IUU (or other “fishy” business). FishEye has transformed the database into a knowledge graph. It includes information about companies, owners, workers, and financial status. FishEye is aiming to use this graph to identify anomalies that could indicate a company is involved in IUU.</p>
+<p>FishEye analysts have attempted to use traditional node-link visualizations and standard graph analyses, but these were found to be ineffective because the scale and detail in the data can obscure a business’s true structure. Can you help FishEye develop a new visual analytics approach to better understand fishing business anomalies?</p>
+</section>
+<section id="fa-fish-fins-project-objectives" class="level1">
+<h1><i class="fa-solid fa-fish-fins" aria-label="fish-fins"></i> Project Objectives</h1>
+<p>This study aims to address the following tasks in sequence:</p>
+<ul>
+<li><strong>1: Identify anomalies</strong> in the business groups present in the knowledge graph</li>
+<li><strong>2: Develop a visual analytics process to find similar businesses and group them</strong>, focusing on a business’s most important features and present those features clearly to the user.</li>
+<li><strong>3: Measure similarity of businesses that you group in task 2</strong>, and express confidence in your groupings visually</li>
+<li><strong>4: Provide evidence for or against the case that anomalous companies are involved in illegal fishing,</strong> based on analysis in tasks 1-3, and suggest Which business groups FishEye should investigate further.</li>
+</ul>
+</section>
+<section id="fa-fish-fins-proposed-methodology" class="level1">
+<h1><i class="fa-solid fa-fish-fins" aria-label="fish-fins"></i> Proposed Methodology</h1>
+<div class="cell" data-fig-width="8">
+<div class="cell-output-display">
+<div>
+<p>
+</p><pre class="mermaid mermaid-js" data-tooltip-selector="#mermaid-tooltip-1">flowchart LR
+  A{Task 1:\nIdentify\nAnomalies} --&gt;|patterns?|B[products or\nservices]
+  A --&gt;|suspicious?|C[revenue]
+  A --&gt;|abnormal?|D[links]
+  A -.- E{Task 2:\nGrouping} -.- I{Tasks 3&amp;4}
+  E --&gt;|overlaps?|F(Company Contacts)
+  E --&gt;|overlaps?|G(Beneficial Owners)
+  E --&gt;|similarities?|H(Country)
+  E --&gt;|similarities?|C
+  E --&gt;|similarities?|B
+  I --&gt; J([Evaluative Metrics])
+</pre>
+<div id="mermaid-tooltip-1" class="mermaidTooltip">
+
+</div>
+<p></p>
+</div>
+</div>
+</div>
+</section>
+<section id="fa-fish-fins-shiny-app" class="level1">
+<h1><i class="fa-solid fa-fish-fins" aria-label="fish-fins"></i> Shiny App</h1>
+<p>The proposed Shiny App will be an interactive Network Graph visualising different groups of businesses. It will consist of several tabs, highlighing important information related to the tasks:</p>
+<p>I. Entities with <em>Fishy</em> Data patterns<br>
+II. Grouping options for the Network, visualised in an interactive Network Graph (visNetwork)<br>
+III. Proposed Clusters based on user input on clustering criteria<br>
+IV. Evaluative metrics applied to Network Graph II</p>
 
 
+</section>
 
 </main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">

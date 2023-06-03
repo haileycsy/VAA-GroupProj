@@ -1,11 +1,6 @@
 ---
-title: "VAST Challenge"
+title: "Finding NEMO"
 title-block-banner: true
 toc: true
 ---
 
-# Text text 
-
-## Test text text
-
-### text text text text

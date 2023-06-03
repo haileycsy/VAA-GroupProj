@@ -17,9 +17,13 @@ website:
             href: index.qmd
           - text: "About the Team"
             href: about.html
+      - text: "Proposal"
+        href: proposal.html
             
 format:
   html:
+    grid:
+      margin-width: 150px
     toc: true
     theme: 
       - journal
