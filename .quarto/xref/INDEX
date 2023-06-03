@@ -7,5 +7,8 @@
   },
   "proposal.qmd": {
     "proposal.html": "fced8fb1"
+  },
+  "testing/testing.qmd": {
+    "testing.html": "378cdb1f"
   }
 }
