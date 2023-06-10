@@ -4,3 +4,19 @@ title-block-banner: true
 toc: true
 ---
 
+# Welcome!
+
+You've landed on the sunny shores of our Visual Analytics Project.
+
+For this project, we will be tackling Mini-Challenge 3 of the [VAST Challenge 2023](https://vast-challenge.github.io/2023/).
+
+
+#Mini Challenge 3
+
+## Background
+**FishEye International** has been given access to an international finance corporation’s database on fishing related companies. In the past, FishEye has determined that companies with anomalous structures are far more likely to be involved in IUU. 
+
+##Your MIssion 
+###(should you choose to accept it)
+
+Help FishEye to develop a **new visual analytics approach** to better understand fishing business __**anomalies**__. 
