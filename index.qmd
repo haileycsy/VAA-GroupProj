@@ -16,7 +16,9 @@ For this project, we will be tackling Mini-Challenge 3 of the [VAST Challenge 20
 ## Background
 **FishEye International** has been given access to an international finance corporation’s database on fishing related companies. In the past, FishEye has determined that companies with anomalous structures are far more likely to be involved in IUU. 
 
-##Your MIssion 
+##Your Mission 
 ###(should you choose to accept it)
 
 Help FishEye to develop a **new visual analytics approach** to better understand fishing business __**anomalies**__. 
+
+Test
