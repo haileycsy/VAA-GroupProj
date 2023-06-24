@@ -15,7 +15,8 @@ website:
         href: about.html
       - text: "Proposal"
         href: proposal.html
-      - text: "Analysis"
+      - text: "Fishy Business"
+        href: anomalies.html
             
 format:
   html:
@@ -23,7 +24,6 @@ format:
       margin-width: 150px
     toc: true
     theme: 
-      - journal
       - theme.scss
     highlight-style: tango
     code-copy: hover

@@ -10,5 +10,8 @@
   },
   "testing/testing.qmd": {
     "testing.html": "378cdb1f"
+  },
+  "anomalies.qmd": {
+    "anomalies.html": "63c2a9e9"
   }
 }

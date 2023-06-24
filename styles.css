@@ -5,6 +5,7 @@
 
 .navbar-brand {
   font-family: 'Tilt Neon', cursive;
+  font-size: 22px;
 }
 
 .navbar-brand > img {
