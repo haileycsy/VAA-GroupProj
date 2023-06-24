@@ -2,7 +2,7 @@ project:
   type: website
 
 website:
-  title: "VAA-GroupProj"
+  title: "FindingNEMO"
   image: "images/shoal.png"
   favicon: "images/fishbone-icon.png"
   navbar:
@@ -11,14 +11,11 @@ website:
     collapse-below: lg
     search: true
     right:
-      - text: "Home"
-        menu: 
-          - text: "Home"
-            href: index.qmd
-          - text: "About the Team"
-            href: about.html
+      - text: "The Team"
+        href: about.html
       - text: "Proposal"
         href: proposal.html
+      - text: "Analysis"
             
 format:
   html:

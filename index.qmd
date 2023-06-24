@@ -1,6 +1,7 @@
 ---
-title: "Finding NEMO"
-title-block-banner: true
-toc: true
+title: " "
+toc: false
+format:
+  html:
+    css: landing.css
 ---
-

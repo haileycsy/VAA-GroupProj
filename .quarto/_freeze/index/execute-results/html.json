@@ -1,16 +1,12 @@
 {
-  "hash": "2f4fbe7d4dac356ff7bfd20b74e99200",
+  "hash": "b6647517a5ca0b9b526b1b241c8f38b2",
   "result": {
-    "markdown": "---\ntitle: \"VAST Challenge\"\npage-layout: full\ntitle-block-banner: true\ntoc: true\n---\n\n\n# Text text text \n\n\n::: {.cell}\n\n```{.r .cell-code}\npacman::p_load(nomnoml, rolldown)\n```\n:::\n\n\n::: {.content-block}\n::: {.features}\n\n::: {.feature}\n::: {.feature-top}\n### Blog\n\nLatest from the blog\n\n::: {#listing-blog}\n:::\n:::\n\n::: {.feature-bottom}\n[Insert Link](blog.qmd){.btn .btn-secondary role=\"button\"}\n:::\n:::\n\n::: {.feature}\n::: {.feature-top}\n### Talks\n\nLatest talk I've done\n\n::: {#listing-talks}\n:::\n:::\n\n::: {.feature-bottom}\n[Insert link](talks.qmd){.btn .btn-secondary role=\"button\"}\n:::\n:::\n\n::: {.feature}\n::: {.feature-top}\n### Projects\n\n\n\n::: {#listing-projects}\n:::\n:::\n\n\n```\n\n::: {.feature-bottom}\n[Insert Links](projects.qmd){.btn .btn-secondary role=\"button\"}\n:::\n:::\n::: {.cell}\n\n```{.nomnoml .cell-code}\n#stroke: black\n#.box: fill=#8f8 dashed visual=ellipse\n\n[A]-[B]\n[B]-[<box>C]\n:::\n:::\n```\n\n::: {.cell-output-display}\n```{=html}\n<div class=\"nomnoml html-widget html-fill-item-overflow-hidden html-fill-item\" id=\"htmlwidget-46bca066f3b339225361\" style=\"width:100%;height:464px;\"></div>\n<script type=\"application/json\" data-for=\"htmlwidget-46bca066f3b339225361\">{\"x\":{\"code\":\"\\n#fill: #FEFEFF\\n#lineWidth: 1\\n#zoom: 4\\n#direction: right\\n\\n#stroke: black\\n#.box: fill=#8f8 dashed visual=ellipse\\n\\n[A]-[B]\\n[B]-[<box>C]\\n:::\\n:::\",\"svg\":false,\"png\":null},\"evals\":[],\"jsHooks\":[]}</script>\n```\n:::\n:::\n::: {.cell}\n\n```{.r .cell-code}\nrolldown::scrollama_setup(\n  list(step = '.level1', offset = .2, debug = TRUE)\n)\n```\n\n::: {.cell-output-display}\n```{=html}\n<script>(function() {\n  var scroller = scrollama();\n  scroller.setup({\"step\":\".level1\",\"offset\":0.2,\"debug\":true})\n    .onStepEnter(res => {\n      res.element.classList.add(\"is-active\");\n    })\n    .onStepExit(res => {\n      res.element.classList.remove(\"is-active\");\n    });\n  window.addEventListener(\"resize\", scroller.resize);\n})();</script>\n```\n:::\n:::",
+    "markdown": "\n\n\ncat('<body class=\"landing-page\">\\n')\ncat('<div class=\"background-image\"></div>\\n')\n\ncat('<style>\\n')\ncat('html, body {\\n')\ncat('  height: 100%;\\n')\ncat('  margin: 0;\\n')\ncat('  padding: 0;\\n')\ncat('}\\n\\n')\ncat('.landing-page {\\n')\ncat('  display: flex;\\n')\ncat('  flex-direction: column;\\n')\ncat('  align-items: center;\\n')\ncat('  justify-content: center;\\n')\ncat('}\\n\\n')\ncat('.background-image {\\n')\ncat('  position: fixed;\\n')\ncat('  top: 0;\\n')\ncat('  left: 0;\\n')\ncat('  width: 100%;\\n')\ncat('  height: 100%;\\n')\ncat('  background-image: url(\"images/landing.png\");\\n')\ncat('  background-size: cover;\\n')\ncat('  background-position: center;\\n')\ncat('  z-index: -1;\\n')\ncat('}\\n')\ncat('</style>\\n')\n```",
     "supporting": [],
     "filters": [
       "rmarkdown/pagebreak.lua"
     ],
-    "includes": {
-      "include-in-header": [
-        "<script src=\"site_libs/htmlwidgets-1.6.2/htmlwidgets.js\"></script>\r\n<script src=\"site_libs/es6shim-0.35.6/es6shim.js\"></script>\r\n<script src=\"site_libs/es7shim-6.0.0/es7shim.js\"></script>\r\n<script src=\"site_libs/graphre-0.1.3/graphre.js\"></script>\r\n<script src=\"site_libs/nomnoml-1.5.3/nomnoml.js\"></script>\r\n<script src=\"site_libs/nomnoml-binding-0.2.6/nomnoml.js\"></script>\r\n"
-      ]
-    },
+    "includes": {},
     "engineDependencies": {},
     "preserve": {},
     "postProcess": true
