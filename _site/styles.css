@@ -5,7 +5,7 @@
 
 .navbar-brand {
   font-family: 'Tilt Neon', cursive;
-  font-size: 22px;
+  font-size: 30px;
 }
 
 .navbar-brand > img {
@@ -23,4 +23,20 @@
   margin-left: .1em;
 }
 
+}
+
+/* Custom callout boxes */
+
+.fishbox {
+  padding: 1em 1em 1em 3em;
+  margin-bottom: 10px;
+  border: 1.5px solid #163759;
+  border-radius: 10px;
+  font-size: 13px;
+  background: #C3F4DD 5px center/3em no-repeat;
+}
+
+.fish {
+  background-image: url("images/fish.png");
+  background-position: 1em center;
 }
