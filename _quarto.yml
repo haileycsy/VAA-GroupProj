@@ -16,7 +16,7 @@ website:
       - text: "Proposal"
         href: proposal.html
       - text: "Fishy Business"
-        href: anomalies.html
+        href: fishy_business.html
             
 format:
   html:

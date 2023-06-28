@@ -25,6 +25,23 @@
 
 }
 
+/* Custom CSS for panel-tabset */
+.panel-tabset {
+  border: 1px solid #F8F3E6; /* Set the outer border color */
+}
+
+/* unselected tabs */
+.panel-tabset .nav-link {
+  border-color: #F8F3E6;
+  color: #64605f;
+}
+
+/* selected tabs */
+.panel-tabset .nav-link.active {
+  border-color: #F8F3E6;
+  color: #4B787D; /* Set the font color for the selected tab */
+}
+
 /* Custom callout boxes */
 
 .fishbox {
