@@ -1,11 +1,11 @@
 ---
-title: "Take-home Exercise 3 - MC3"
+title: "Topic Modelling Code"
 author: "Shaun Tan"
 date: "6/3/2023"
 date-modified: "`r Sys.Date()`"
 format:
   html:
-    code-fold: true
+    code-fold: False
     code-summary: "Show the code"
 execute:
   warning: False
@@ -13,10 +13,10 @@ execute:
   eval: True
 ---
 
-
 ```{r}
 pacman::p_load(jsonlite, tidygraph, ggraph, visNetwork, gralayouts, ggforce, tidytext, tidyverse, skimr, patchwork, ggdist, ggridges, ggthemes, scales, lsa, topicmodels, ldatuning)
 ```
+
 ```{r}
 mc3_data <-
   jsonlite::fromJSON("data/MC3.json")
@@ -35,7 +35,7 @@ mc3_edges <-
   summarise(weights = n()) %>%
   filter(source!=target) %>%
   ungroup()
-``` 
+```
 
 ## 2.3 Extracting Nodes
 
@@ -64,6 +64,7 @@ stopwords_removed <- token_nodes %>%
   filter(!word %in% c('unknown', 'products','related')) %>% 
   anti_join(stop_words)
 ```
+
 Start of Topic Modelling
 
 ```{r}
@@ -72,7 +73,6 @@ dtm<- stopwords_removed %>%
   cast_dtm(id, word, n) %>%  
   as.matrix()
 ```
-
 
 ```{r}
 # Extract probability of the topic for each company
@@ -119,8 +119,4 @@ company<-company %>%
 company<- company %>% 
   drop_na(Industry) %>% 
   drop_na(revenue)
-```
-
-```{r}
-write.csv(company, file = "data/topicmodelling.csv", row.names = FALSE)
 ```

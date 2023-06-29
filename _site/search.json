@@ -5,5 +5,47 @@
     "title": "About",
     "section": "",
     "text": "About this site\n\n1 + 1\n\n[1] 2"
+  },
+  {
+    "objectID": "testing/Topic Modelling code.html",
+    "href": "testing/Topic Modelling code.html",
+    "title": "Topic Modelling Code",
+    "section": "",
+    "text": "pacman::p_load(jsonlite, tidygraph, ggraph, visNetwork, gralayouts, ggforce, tidytext, tidyverse, skimr, patchwork, ggdist, ggridges, ggthemes, scales, lsa, topicmodels, ldatuning)"
+  },
+  {
+    "objectID": "testing/Topic Modelling code.html#extracting-edges",
+    "href": "testing/Topic Modelling code.html#extracting-edges",
+    "title": "Topic Modelling Code",
+    "section": "2.2 Extracting Edges",
+    "text": "2.2 Extracting Edges\n\nmc3_edges <-\n  as_tibble(mc3_data$links) %>%\n    distinct() %>%\n  mutate(source = as.character(source),\n         target = as.character(target),\n         type = as.character(type)) %>%\n  group_by(source, target, type) %>%\n  summarise(weights = n()) %>%\n  filter(source!=target) %>%\n  ungroup()"
+  },
+  {
+    "objectID": "testing/Topic Modelling code.html#extracting-nodes",
+    "href": "testing/Topic Modelling code.html#extracting-nodes",
+    "title": "Topic Modelling Code",
+    "section": "2.3 Extracting Nodes",
+    "text": "2.3 Extracting Nodes\n\nmc3_nodes <- as_tibble(mc3_data$nodes) %>%\n# distinct() %>%\n  mutate(country = as.character(country),\n         id = as.character(id),\n         product_services = as.character(product_services),\n         revenue_omu = as.numeric(as.character(revenue_omu)),\n         type = as.character(type)) %>%\n  select(id, country, type, revenue_omu, product_services)\n\n\n## Token_nodes\ntoken_nodes <- mc3_nodes %>%\n  filter(type=='Company') %>% \n  unnest_tokens(word, \n                product_services)\n\n\n# Removing Stop words\nstopwords_removed <- token_nodes %>%\n  filter(!word %in% c('unknown', 'products','related')) %>% \n  anti_join(stop_words)\n\nStart of Topic Modelling\n\ndtm<- stopwords_removed %>%\n  count(id, word) %>% \n  cast_dtm(id, word, n) %>%  \n  as.matrix()\n\n\n# Extract probability of the topic for each company\nlda_topics <- LDA(\n  dtm,\n  k = 5,\n  method = \"Gibbs\",\n  control = list(seed=42)\n  ) %>% \n  tidy(matrix = \"gamma\")\n\n\n# Summarize company revenue\ncompany<-mc3_nodes %>%\n  filter(type=='Company') %>% \n  group_by(id) %>% \n  summarise(revenue=sum(revenue_omu))\n\n\n# Assign topic with the highest gamma score to the document/company\ncp_map<-lda_topics %>% \n  group_by(document) %>% \n  summarise(gamma=max(gamma)) \n\ncp_map<-cp_map %>% \n  left_join(lda_topics) %>% \n  mutate(topic=recode(topic, '1'=\"accessories_materials\",\n                      '2'=\"food\",\n                      '3'=\"equipment\",\n                      '4'=\"fish_seafood\",\n                      '5'=\"services\")) %>%\n  rename(\"Industry\"=\"topic\") %>% \n  select(document, Industry)\n\n\n# Use left join to join back to company revenue info\ncompany<-company %>%\n  inner_join(cp_map, by=c(\"id\"=\"document\"))\n\n# Drop those company with unknown industry\ncompany<- company %>% \n  drop_na(Industry) %>% \n  drop_na(revenue)"
+  },
+  {
+    "objectID": "testing/Topic_Modelling_code.html",
+    "href": "testing/Topic_Modelling_code.html",
+    "title": "Topic_Modelling_Code",
+    "section": "",
+    "text": "pacman::p_load(jsonlite, tidygraph, ggraph, visNetwork, gralayouts, ggforce, tidytext, tidyverse, skimr, patchwork, ggdist, ggridges, ggthemes, scales, lsa, topicmodels, ldatuning)"
+  },
+  {
+    "objectID": "testing/Topic_Modelling_code.html#extracting-edges",
+    "href": "testing/Topic_Modelling_code.html#extracting-edges",
+    "title": "Topic_Modelling_Code",
+    "section": "2.2 Extracting Edges",
+    "text": "2.2 Extracting Edges\n\nmc3_edges <-\n  as_tibble(mc3_data$links) %>%\n    distinct() %>%\n  mutate(source = as.character(source),\n         target = as.character(target),\n         type = as.character(type)) %>%\n  group_by(source, target, type) %>%\n  summarise(weights = n()) %>%\n  filter(source!=target) %>%\n  ungroup()"
+  },
+  {
+    "objectID": "testing/Topic_Modelling_code.html#extracting-nodes",
+    "href": "testing/Topic_Modelling_code.html#extracting-nodes",
+    "title": "Topic_Modelling_Code",
+    "section": "2.3 Extracting Nodes",
+    "text": "2.3 Extracting Nodes\n\nmc3_nodes <- as_tibble(mc3_data$nodes) %>%\n# distinct() %>%\n  mutate(country = as.character(country),\n         id = as.character(id),\n         product_services = as.character(product_services),\n         revenue_omu = as.numeric(as.character(revenue_omu)),\n         type = as.character(type)) %>%\n  select(id, country, type, revenue_omu, product_services)\n\n\n## Token_nodes\ntoken_nodes <- mc3_nodes %>%\n  filter(type=='Company') %>% \n  unnest_tokens(word, \n                product_services)\n\n\n# Removing Stop words\nstopwords_removed <- token_nodes %>%\n  filter(!word %in% c('unknown', 'products','related')) %>% \n  anti_join(stop_words)\n\nStart of Topic Modelling\n\ndtm<- stopwords_removed %>%\n  count(id, word) %>% \n  cast_dtm(id, word, n) %>%  \n  as.matrix()\n\n\n# Extract probability of the topic for each company\nlda_topics <- LDA(\n  dtm,\n  k = 5,\n  method = \"Gibbs\",\n  control = list(seed=42)\n  ) %>% \n  tidy(matrix = \"gamma\")\n\n\n# Summarize company revenue\ncompany<-mc3_nodes %>%\n  filter(type=='Company') %>% \n  group_by(id) %>% \n  summarise(revenue=sum(revenue_omu))\n\n\n# Assign topic with the highest gamma score to the document/company\ncp_map<-lda_topics %>% \n  group_by(document) %>% \n  summarise(gamma=max(gamma)) \n\ncp_map<-cp_map %>% \n  left_join(lda_topics) %>% \n  mutate(topic=recode(topic, '1'=\"accessories_materials\",\n                      '2'=\"food\",\n                      '3'=\"equipment\",\n                      '4'=\"fish_seafood\",\n                      '5'=\"services\")) %>%\n  rename(\"Industry\"=\"topic\") %>% \n  select(document, Industry)\n\n\n# Use left join to join back to company revenue info\ncompany<-company %>%\n  inner_join(cp_map, by=c(\"id\"=\"document\"))\n\n# Drop those company with unknown industry\ncompany<- company %>% \n  drop_na(Industry) %>% \n  drop_na(revenue)"
   }
 ]
