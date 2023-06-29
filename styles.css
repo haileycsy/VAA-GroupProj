@@ -57,3 +57,17 @@
   background-image: url("images/fish.png");
   background-position: 1em center;
 }
+
+.alertbox {
+  padding: 1em 1em 1em 3em;
+  margin-bottom: 10px;
+  border: 1.5px solid #D86171;
+  border-radius: 10px;
+  font-size: 13px;
+  background: #fad1a7 5px center/3em no-repeat;
+}
+
+.alert {
+  background-image: url("images/alert.png");
+  background-position: 1em center;
+}
