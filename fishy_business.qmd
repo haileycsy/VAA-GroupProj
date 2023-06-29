@@ -32,18 +32,20 @@ The following packages are used for this study:
 -   `jsonlite` to read and process raw .json data files
 -   `tidyverse`, a collection of packages for data analysis (particularly `dplyr` for data manipulation)
 -   `skimr` and `Hmisc` for generating summary statistics of dataframes and variables
--   `kable` and `kableExtra` for styling tables from dataframes
+-   `DT`, kable` and `kableExtra` for styling tables from dataframes
 -   `ggplot2` and `ggpubr` for plot visualisations
 -   `scales` to complement `ggplot2`, specifically for specifying axes breaks
 -   `ggrain` for raincloud plots to visualise density distributions
 -   `patchwork` for multiple plot layouts
--   `visNetwork` for network graph visualisations
+-   `visNetwork`, `ggraph` and `igraph` for network graph visualisations
 -   `ggthemes` to standardise plot aesthetics
--   
+-   `tidytext`, `tm` & `wordcloud2` for text mining and visualisation
+-   `ldatuning`, `lsa` and `topicmodels` for topic modeling 
+
 
 ```{r intstall-packages}
 #| message: false
-pacman::p_load(jsonlite, tidyverse, skimr, Hmisc, kable, kableExtra, ggplot2, scales, ggthemes, visNetwork, tidygraph, ggrain, patchwork, ggpubr, htmlwidgets, treemapify)
+pacman::p_load(jsonlite, tidyverse, skimr, Hmisc, DT, kable, kableExtra, ggplot2, scales, ggthemes, visNetwork, ggraph, igraph, tidygraph, ggrain, patchwork, ggpubr, htmlwidgets, treemapify, tidytext, tm, wordcloud2, ldatuning, lsa, topicmodels)
 ```
 
 ## Unpacking the Data
@@ -316,11 +318,25 @@ links_type <- mc3_links_new %>%
 
 all_type <- nodes_type + links_type
 all_type & theme(plot.background = element_rect(fill="#dfdfeb",colour="#dfdfeb"))
-```
+```  
+  
+  
+::: {.alertbox .alert data-latex="alert"}
+
+**Key Stakeholders: Beneficial Owners**
+
+-   Count of entities by type shows that there are a higher number of **Beneficial Owners** listed than **Companies**. This suggests that **Company Ownership Structures** will need to be investigated to see if there are *fishy* network connections  
+-   Company name suffixes indicate the type of registered company and ownership:   
+    - **Limited Liability** or **LLC** refers to privately owned businesses (fewer Owners). These companies are managed by the owners or "members" that could be individuals or other business entities
+    - **Publicly Listed Companies** or **PLC** refers to companies owned by shareholders (larger number of owners), and are managed by a single director or board of directors  
+    - **Inc** or **Corporation** denotes a legal entity that is separate from its owners. However, these companies may have shareholders as well
+    
+:::
 
 ## Are there Entities with Multiple Roles or Links?
 
 ::: panel-tabset
+
 ## **Nodes With Multiple Roles**
 
 Analysis revealed that there are Companies with multiple roles in the **Nodes** dataframe:
@@ -339,11 +355,13 @@ nodes_multiple <- nodes_pivot%>%
            (`Company` >=1 & `Beneficial Owner` >=1) |
             (`Beneficial Owner` >=1 & `Company Contacts` >=1))
 
-kable(head(nodes_multiple, 10)) %>%
-  kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"))
-```
+datatable(nodes_multiple)
+```  
+.  
+
 
 ::: {.alertbox .alert data-latex="alert"}
+
 **Similarly Named Companies**
 
 -   Data revealed companies with similar names, but different business structure suffixes: Inc, LLC, Ltd, PLC.
@@ -544,9 +562,10 @@ kable(head(nodes_count_country, 10)) %>%
 -   From the data presented above, it seems as though there are multiple Entities operating across country borders.\
 -   The number of countries listed match the count of roles, which suggests that these entities may be involved in multiple sub-network clusters within the overall network.\
 -   Companies with the highest count, **Aqua Aura SE Marine life, Tamil Nadu s A/S & Transit Limited Liability Company** may need to be investigated further, as their transboundary operations may reveal *fishy* connections.
+
 :::
 
-## How much revenue is being reported by the Companies?
+## How Much Revenue is Being Reported by the Companies?
 
 ```{r}
 #| fig-width: 8
@@ -586,6 +605,7 @@ company_rev
 ```
 
 ::: {.fishbox .fish data-latex="focus"}
+
 Distribution of revenue as well as quantile values show a **highly right-skewed distribution**, which could be an indication of company size. To use this variable for further classification of anomalous groups, revenue is binned by percentile and assigned a label. As missing Revenue values could be a data lapse issue, or a sign of concealing possible *fishy* actvity, which is kept as a separate category for further analysis:
 
 -   Above 80th Percentile: 1
@@ -594,6 +614,7 @@ Distribution of revenue as well as quantile values show a **highly right-skewed 
 -   20-40th Percentile: 4
 -   Below 20th Percentile: 5
 -   Missing Values : NA
+
 :::
 
 ```{r}
@@ -637,31 +658,476 @@ ggplot(
 
 ```
 
-### Revenue of Companies with multiple roles
+### Average Revenue of Companies by Country
 
 ```{r}
-nodes_sus1 <- mc3_nodes_new %>%
-  filter(id %in% nodes_multiple$id)
-
-nodes_sus_grp <- nodes_sus1 %>%
-  group_by(revenue_group, type) %>%
-  summarise(count = n()) %>%
+#| fig-width: 7
+country_rev <- mc3_nodes_new %>%
+  group_by(country) %>%
+  summarise(companies = n(),
+            avg_revenue = sum(revenue_omu, na.rm = TRUE)/companies) %>%
   ungroup()
 
-ggplot(nodes_sus_grp, 
-       aes(area = count, fill = revenue_group, label = type)
+ggplot(country_rev, 
+       aes(area = avg_revenue/1000, fill = avg_revenue, label = country)
   ) +
   geom_treemap() +
-  geom_treemap_text(colour = "grey10",
-                    place = "centre",
-                    size = 10
+  geom_treemap_text(
+    aes(label = paste(country, companies, sep = "\n")),
+    colour = "#dfdfeb",
+    place = "centre",
+    size = 12
   ) +
-  scale_fill_brewer(palette = "Blues")
+  scale_fill_continuous(
+    name = "Average Revenue",
+    labels = scales::dollar_format(),
+    low = "#D86171",
+    high = "#4d5887"
+  ) +
+  labs(
+    title = "Average Revenue by Country with Company Count"
+  ) +
+  theme_fivethirtyeight()+
+  theme(
+    # Change Legend Position to the right
+    legend.position = "right",
+    legend.direction = "vertical",
+    legend.background = element_rect(fill="#dfdfeb",colour="#dfdfeb"),
+    panel.background = element_rect(fill="#dfdfeb",colour="#dfdfeb"),
+    plot.background = element_rect(fill="#dfdfeb",colour="#dfdfeb")
+  )
+```  
+.  
+
+::: {.alertbox .alert data-latex="alert"}
+
+**ZH has highest number of companies but lower average revenue**
+
+-   The treemap of revenue by country reveals that **Alverovia has only a single listed company but highest average recorded revenue: OceanFront Foods SRL Line**
+-   There are also several other Countries with fewer listed companies such as **Rosvandor, Azurionix and Osterivaria** that recorded higher average revenue than the country with most listed companies, ZH. 
+
+:::  
+  
+Interestingly, companies from these countries with higher average revenue but fewer companies listed mostly offer **products and services unrelated to fishing**. This suggests that **both fishing-related and non-fishing related companies need to be examined further** -- and that there may be *fishy* connections between companies from different industries that may cover up IUU activities. 
+
+```{r}
+highrev_companies <- mc3_nodes_new %>%
+  filter(country %in% c("Alverovia", "Rosvandor", "Rio Isla", "Azurionix", "Osterivaria"),
+         revenue_group == "1") %>%
+  select(id, country, revenue_group, product_services) %>%
+  arrange(country)
+
+datatable(highrev_companies)
+```  
+
+# Grouping *fishy* Businesses
+
+## Grouping by Industry  
+  
+As mentioned in the section above, analysis showed that **higher average revenue has a strong relation to non-fishing related companies.** Summary statistics also revealed that the **product_services** variable has a large range of characters, that makes it difficult to classify the companies into industries for comparison. Text mining in the form of Tokenisation, as well as Topic Modeling (an unsupervised learning method) were used to deconstruct the text present in **product_services** to form more meaningful categories.  
+
+### Data Preparation: Tokenisation  
+
+```{r}
+#| code-fold: false
+# Replace all 'character(0)' values as unknown
+mc3_nodes_new$product_services[mc3_nodes_new$product_services == "character(0)"] <- "Unknown"
+
+# Create new dataframe with words split into separate rows
+nodes_unnest <- mc3_nodes_new %>%
+  filter(type == "Company") %>%
+  # Create new column 'word' to store split words
+  unnest_tokens(word, 
+                product_services,
+    # Change all words to lowercase for more accurate tokenisation
+                to_lower = TRUE,
+    # Remove punctuation to exclude from tokenisation
+                strip_punct = TRUE)
+```
+ 
+::: panel-tabset
+
+## **I: Extract the Text**
+
+```{r}
+#| code-fold: false
+# Create a vector containing only the text
+nodes_text <- nodes_unnest$word 
+
+# Create a corpus
+text <- Corpus(VectorSource(nodes_text))
 ```
 
-# Grouping *Fishy* Businesses
+## **II: Clean the Text Data**  
+  
+The process of removing specific stopwords using removeWords is an iterative process, where higher frequency words are removed if deemed out of context (such as ‘well’, ‘including’, ‘related’ or unproductive in giving specific information about the nature of businesses (such as ‘source’, ‘materials’, etc).  
 
-Based on initial analysis, there is an avenue to explore the relationship between different variables to sieve out anomalous groups within the overall network:
+```{r}
+#| code-fold: false
+text <- text %>%
+  # Remove any whitespace
+  tm_map(stripWhitespace) %>%
+  # remove stopwords
+  tm_map(removeWords, stopwords(kind = "en")) %>%
+  # Specity stopwords based on initial analysis of word frequency
+  tm_map(removeWords, c("products", "including", "well", "related", "services", "source", "materials", "goods", "offers", "range"))
+```
+
+## **III: Create document-term-matrix (DTM) to count word frequency**
+
+```{r}
+# Generate a document-term-matrix
+dtm <- TermDocumentMatrix(text) 
+matrix <- as.matrix(dtm) 
+# Sort matrix according to frequency
+words <- sort(rowSums(matrix),decreasing = TRUE) 
+# Count frequency of each word and save as new column in dataframe
+text_df <- data.frame(word = names(words),freq = words)
+
+datatable(head(text_df,15))
+```  
+  
+  
+The table output shows that **“Unknown” products and services are the most frequently listed.** While this could possibly point to  *fishy* business relationships, these records may also be masking other anomalies present. A separate text dataframe is created without “unknown” products and services:  
+
+```{r}
+text_df_known <- text_df[-1,]
+```
+
+:::
+
+```{r}
+wordcloud2(text_df_known, 
+           color = "random-dark", 
+           backgroundColor = "#F8F3E6")
+```  
+.  
+
+::: {.fishbox .fish data-latex="focus"}
+
+The wordcloud reveals that **fishing-related products** seem to appear the most frequently. However, there are several words that appear frequently enough to take note of:
+
+-  equipment
+-  industrial
+-  transportation
+-  freelance
+-  researcher
+
+**freelance researcher** was found to be listed as the source of information for products and services. This was thus not an accurate representation of industry category. As the use of just singular words may be taken out of context, especially from phrases used in longer descriptions, further analysis was conducted for **pairs of words (bigrams)**
+
+:::
+
+
+### Plotting Bigram of Frequent Products and Services  
+
+::: panel-tabset
+
+## **I: Unnesting tokens as Bigrams**
+
+```{r}
+#| code-fold: false
+nodes_unnest2 <- mc3_nodes %>%
+  filter(type == "Company") %>%
+   unnest_tokens(bigram, 
+                 product_services, 
+                 token = "ngrams", 
+                 n = 2, 
+                 to_lower = TRUE,) %>%
+  # remove empty rows
+  filter(!is.na(bigram)) %>%
+  # Remove specific stopwords from bigrams
+  filter(!str_detect(bigram,"including|range|related|freelance")) %>%
+  select(id, bigram)
+```
+
+## **II: Creating Links**  
+
+
+```{r}
+#| code-fold: false
+product_bigram <- nodes_unnest2 %>%
+    count(bigram, sort = TRUE) %>%
+  # Split bigram words into separate columns, uding space as delimiter
+    separate(bigram, c("word1", "word2"), sep = " ") %>%
+  # Only match words not in stopwords
+    anti_join(stop_words, by = c("word1" = "word")) %>%
+    anti_join(stop_words, by = c("word2" = "word")) %>%
+  # Keep only characters, dropping numbers 
+    filter(str_detect(word1, "[a-z]") & str_detect(word2, "[a-z]"))
+```
+
+## **III: Creating Graph Object**
+
+Applying a `filter` to keep only most frequently related bigrams
+
+```{r}
+#| code-fold: false
+product_bigram_graph <- product_bigram %>%
+  filter(n >15) %>%
+  graph_from_data_frame()
+```  
+
+:::
+
+```{r}
+#| fig-width: 8
+#| fig-height: 7
+
+set.seed(1234)
+ggraph(
+  product_bigram_graph, 
+  layout = "nicely"
+  ) +
+  geom_edge_link(
+    # Adjust transparency of link based on how common the bigram is
+    aes(edge_alpha = n),
+    arrow = grid::arrow(type = "closed", 
+                        length = unit(.2, "cm")),
+    # Leave a gap between arrow head and circle
+    end_cap = circle(.2, 'cm'),
+    show.legend = FALSE
+  ) +
+  geom_node_point(
+    alpha = .7,
+    size = 3) +
+  geom_node_text(
+    aes(label = name), 
+    repel = TRUE
+  ) +
+  labs(title = "High Frequency of Companies Dealing in Seafood Products",
+       subtitle = "Darker links indicate higher commonality of related terms"
+  ) +
+  theme_fivethirtyeight()+
+  theme(
+    axis.ticks = element_blank(),
+    axis.text = element_blank(),
+    panel.grid = element_blank(),
+    panel.background = element_rect(fill="#dfdfeb",colour="#dfdfeb"),
+    plot.background = element_rect(fill="#dfdfeb",colour="#dfdfeb")
+  )
+```
+
+### Classifying Companies into Industries
+
+Topic Modeling is an unsupervised machine learning method suitable for data exploration. In particular, Latent Dirichlet Allocation (LDA) is useful for 'clustering' text into groups of similar meanings. Similar to k-means Clustering algorithms, the number of topics (or 'clusters') `k` is the most important parameter to define. In the event that `k` is too small, the topics may be over-generalised; if `k` is too large, however, topics may be overlapping or not useful for interpretation. To determine the optimal number of topics `k`, the `FindTopicsNumber` plot is used to compare models for different values of `k`.
+
+::: panel-tabset
+
+## **I: Create DTM from text dataframe**
+
+```{r}
+#| code-fold: false
+nodes_unnest_filtered <- nodes_unnest %>%
+  filter(!word %in% c("products", "including", "well", "related", "services", "source", "materials", "goods", "offers", "range", "unknown", "freelance")) %>% 
+  anti_join(stop_words)
+
+
+```
+
+```{r}
+#| code-fold: false
+dtm2 <- nodes_unnest_filtered %>%
+  count(id, word) %>% 
+  cast_dtm(id, word, n) %>%  
+  as.matrix()
+```
+
+
+## **II: Create models with different k values**
+
+```{r}
+#| code-fold: false
+result <- ldatuning::FindTopicsNumber(
+  dtm2,
+  topics = seq(from = 2, to = 20, by = 1),
+  metrics = c("Griffiths2004", "CaoJuan2009", "Arun2010", "Deveaud2014"),
+  method = "Gibbs",
+  control = list(seed = 123),
+  verbose = TRUE
+)
+```
+
+
+## **III: Plot Results to Find Optimum k**
+
+```{r}
+FindTopicsNumber_plot(result)
+```  
+
+From the plot above, Maximising Griffiths2004 and Deveaud2014 and Minimizing CaoJuan2009 and Arun2010 scores show that `k` = 6 topics seems to be optimal. 
+
+## **IV: Compute the LDA Model**
+
+```{r}
+#| code-fold: false
+# set random number generator seed
+set.seed(1234)
+
+# compute the LDA model
+lda_topics <- LDA(dtm2, 6, 
+                  method="Gibbs", 
+                  control=list(iter = 500, verbose = 25)) %>% 
+  # Extract estimated topic-term probabilities (beta) matrix from LDA results
+  tidy(matrix = "beta")
+```
+
+:::
+
+```{r}
+#| fig-width: 8
+#| fig-height: 7
+# get most representative words by topic by higher probability
+topic_text <- lda_topics %>%
+  group_by(topic) %>%
+  top_n(15, beta) %>%
+  ungroup() 
+
+# Plot in descending order
+ggplot(
+  topic_text,
+  aes(x = fct_reorder(term, beta), 
+      y = beta, 
+      fill = as.factor(topic))
+  ) +
+  geom_col(show.legend = FALSE) +
+  facet_wrap(~ topic, scales = "free") +
+  coord_flip() +
+  labs(
+    title = "6 Different Industries Derived from LDA"
+  ) +
+  theme_fivethirtyeight()+
+  theme(
+    axis.ticks = element_blank(),
+    panel.grid = element_blank(),
+    panel.background = element_rect(fill="#dfdfeb",colour="#dfdfeb"),
+    plot.background = element_rect(fill="#dfdfeb",colour="#dfdfeb")
+  )
+```  
+
+**The companies can be classified under these 6 Industries:**
+
+| **Topic\nNo.** | **Industry**       | **Description**                                                 |
+|:--------------:|--------------------|-----------------------------------------------------------------|
+|      **1**     | Industrial         | Manages equipment, machinery and other industrial materials     |
+|      **2**     | Food               | Vegetables, meat, fruits and other groceries                    |
+|      **3**     | Seafood-processing | Packaging, canning, manufacturing of marine or seafood products |
+|      **4**     | Consumer-goods     | Non-fishing related accessories, furniture, apparel             |
+|      **5**     | Transport-logistics| Companies specialising in logistics, freight, cargo services    |
+|      **6**     | Fishing            | Companies directly related to fishing of salmon, tuna, etc      |
+
+
+::: panel-tabset
+
+## **Computing gamma matrix to get topic assignment per company**
+
+```{r}
+#| code-fold: false
+set.seed(1234)
+
+# compute the LDA model
+lda_topics2 <- LDA(dtm2, 6, 
+                  method = "Gibbs", 
+                  control=list(iter = 500, verbose = 25)) %>% 
+  # Assign probabilities to each company id 
+  tidy(matrix = "gamma")
+```
+## **Assigning labels to Topics**
+
+```{r}
+#| code-fold: false
+# Assign topic with the highest gamma score to the document/company
+cp_map <-lda_topics2 %>% 
+  group_by(document) %>% 
+  summarise(gamma = max(gamma)) 
+
+# Rename topic numbers to categories
+cp_map <- cp_map %>% 
+  left_join(lda_topics2) %>% 
+  mutate(topic = recode(topic, "1" ="Industrial Company",
+                      "2" ="Food Company",
+                      "3" ="Seafood-processing Company",
+                      "4" ="Consumer-goods Company",
+                      "5" ="Transport-logistics Company",
+                      "6" = "Fishing-related Company")) %>%
+  rename("Industry"="topic",
+         "id" = "document") %>% 
+  select(id, Industry)
+```
+
+## **Assigning each Company id an Industry**
+
+```{r}
+#| code-fold: false
+
+# Look for companies assigned more than a single industry
+cp_map_count <- cp_map %>%
+  group_by(id) %>%
+  summarise(count = n()) %>%
+  # Get id of companies in more than a single industry
+  filter(count >1) %>%
+  ungroup()
+
+# Assign new label to ids with multiple rows 
+cp_map$Industry <- ifelse(cp_map$id %in% cp_map_count$id, "Multi-Industry Company", cp_map$Industry)
+
+# remove duplicates
+cp_map <- distinct(cp_map)
+
+# Use left join to join back to company revenue info
+final_nodes <- nodes_pivot %>%
+  left_join(cp_map, by = "id") %>%
+  rename("group" = "Industry")
+
+# Aggregate mc3_nodes to get revenue group
+mc3_nodes_agg <- mc3_nodes_new %>%
+  group_by(id) %>%
+  summarise(country_count = n(),
+            revenue_group = max(as.numeric(revenue_group))) %>%
+  select(id, country_count, revenue_group) %>%
+  ungroup()
+
+# Use join to append country_count and revenue_group to final nodes data
+final_nodes <- final_nodes %>% 
+  left_join(mc3_nodes_agg, by = "id")
+```
+
+:::
+
+```{r}
+#| fig-width: 8
+ggplot(cp_map,
+    aes(x = Industry)
+  ) +
+  geom_bar() +
+ # Set count annotations above bar
+  geom_text(
+    stat = "count",
+    aes(label = after_stat(count)),
+    vjust = -1
+  ) +  
+ # Ensure than annotations are not cut off
+  ylim(0, 900) +
+  labs(
+    title = "Fairly even Distribution of Companies Across Industries "
+  ) +
+  theme_fivethirtyeight()+
+  theme(
+    axis.text.y = element_blank(),
+    axis.title.y = element_blank(),
+    axis.title.x = element_blank(),
+    # Rotate labels to prevent overlapping
+    axis.text.x = element_text(angle = 60, hjust = 1),
+    panel.background = element_rect(fill="#dfdfeb",colour="#dfdfeb"),
+    plot.background = element_rect(fill="#dfdfeb",colour="#dfdfeb")
+  )
+
+```
+
+
+
+## Grouping by Company Structure & Network
+
+Besides looking at industry-based groupings -- which are limited to Companies -- there is an avenue to explore the relationship between different variables to sieve out anomalous groups within the overall network:
 
 ```{mermaid}
 %%| fig-width: 7
@@ -905,7 +1371,7 @@ visNetwork(
 ```
 
 
-## Company Contacts of >= 3 Companies 
+## Company Contacts of 3 or more Companies 
 
 Analysis in the previous sections also showed that there were entities listed as Company Contacts of multiple companies. From the *fishy* patterns highlighted in the above network with Beneficial Ownership, the structure for Company Contacts was visualised for further analysis: 
 
@@ -1111,7 +1577,104 @@ visNetwork(
 ```
 
 
+# A Fishy Network: Shiny App 
 
+Exploratory analysis thus far has revealed some underlying structures of various groups within the network. The most anomalous (and interlinked) sub-networks, High Revenue and High Link Count and Beneficial Owners with Multiple Companies, are concatenated to further investigate if these fishy structures are interlinked, as well as grouping companies and entities by categories.
+
+The “group” that the entity is assigned is based on the following roles:  
+
+| Group                         | Logic                                                                                        |
+|-------------------------------|----------------------------------------------------------------------------------------------|
+| **Ultimate Beneficial Owner** | Beneficial Owner of > 3 Companies, a key player in the network                             |
+| **Multi-role Entity**         | Plays multiple roles within the network, may be a key personnel or broker within the network |
+| **Shareholder**               | Beneficial Owner with a stake in a company                                                   |
+| **Company Contact**           | Company Contact of one or many companies                                                     |
+| **Company**                   | Company belonging to any identified or unknown industry                                      |
+
+
+::: panel-tabset
+
+## **Creating Nodes from Links target**
+
+```{r}
+#| code-fold: false
+links_target <- mc3_links_new %>%
+  select(target) %>%
+  rename("id" = "target") %>%
+  distinct()
+
+```
+
+## **Updating Links Groups**
+
+Using separate dataframes as filters to assign groups to the target individuals from links dataframe:
+
+```{r}
+#Ultimate Beneficial Owners
+ubo <- links_pivot %>%
+  filter(`Beneficial Owner` >3)
+
+# Multi-role entity
+mre <- links_pivot %>%
+  filter(`Beneficial Owner` >=1 & `Company Contacts` >=1)
+
+# Shareholder
+sh <- links_pivot %>%
+  filter(`Beneficial Owner` <=3 & `Company Contacts` == 0)
+
+links_target$group <- ifelse(links_target$id %in% ubo$target, "Ultimate Beneficial Owner",
+                        ifelse(links_target$id %in% mre$target, "Multi-role Entity",
+                          ifelse(links_target$id %in% sh$target, "Shareholder", "Company Contact")))
+```
+
+## **Assigning Group Logic to nodes**
+
+```{r}
+# Assign multi-role entities
+final_nodes$group <- ifelse(final_nodes$id %in% nodes_multiple$id, "Multi-role Entity", final_nodes$group)
+
+# Flag if nodes are transboundary operations
+final_nodes$transboundary <- ifelse(final_nodes$country_count >=2, "yes", "no")
+
+# Select only useful columns
+final_nodes <- final_nodes %>%
+  select(id, group, revenue_group, transboundary)
+```
+
+## **Checking for missing companies in Links data not in Nodes**
+
+```{r}
+links_source <- mc3_links_new %>%
+  select(source) %>%
+  rename("id" = "source") %>%
+  distinct()
+
+# check for overlaps
+
+link_overlaps <- links_source %>%
+  anti_join(final_nodes)
+
+link_overlaps$group <- "unknown"
+link_overlaps$revenue_group <- "NA"
+link_overlaps$transboundary <- "unknown"
+
+links_target$revenue_group <- "NA"
+links_target$transboundary <- "NA"
+```
+
+## **Merging dataframes to get final Nodes**
+
+```{r}
+final_nodes_update <- final_nodes %>%
+  filter(final_nodes$id %in% mc3_links_new$source) %>%
+  mutate(revenue_group = as.factor(revenue_group))
+
+final_nodes_update <- bind_rows(final_nodes_update, link_overlaps, links_target) 
+final_nodes_update$group <- ifelse(is.na(final_nodes_update$group), "unknown", final_nodes_update$group)
+```
+
+
+:::
 
 **References**
 
