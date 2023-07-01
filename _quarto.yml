@@ -14,9 +14,11 @@ website:
       - text: "The Team"
         href: about.html
       - text: "Proposal"
-        href: proposal.html
+        href: proposal/proposal.html
       - text: "Fishy Business"
-        href: fishy_business.html
+        href: mc3_1/fishy_business.html
+      - text: "Fishy Similarities"
+        href: mc3_2/fishy_similarities.html
             
 format:
   html:

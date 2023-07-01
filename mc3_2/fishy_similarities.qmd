@@ -1,0 +1,328 @@
+---
+title: "Fishy Similarities"
+title-block-banner: true
+format:
+  html:
+    number-sections: true
+    code-fold: true
+    warning: false
+    message: false
+---
+
+
+<font size = "5">**VAST Challenge 2023: Mini-Challenge 3**</font>
+
+# Project Brief
+
+FishEye International, a non-profit focused on countering illegal, unreported, and unregulated (IUU) fishing, has been given access to an international finance corporation's database on **fishing related companies.** In the past, FishEye has determined that companies with anomalous structures are far more likely to be involved in IUU (or other *fishy* business). FishEye has transformed the database into a knowledge graph, including information about companies, owners, workers, and financial status. FishEye is aiming to use this graph to identify anomalies that could indicate if a company is involved in IUU.
+
+**Project Objective:**
+
+This study aims to use visual analytics to
+
+-   **measure similarity of business groups**
+-   **provide evidence for and against the case that anomalous companies are involved in illegal fishing**
+
+# Data Preparation
+
+## R Packages
+
+```{r intstall-packages}
+#| message: false
+pacman::p_load(tidyverse, DescTools, skimr, ggrepel, DT, kableExtra, ggplot2, scales, ggthemes, visNetwork, ggraph, igraph, gganimate, tidygraph, ggrain, patchwork, ggpubr, htmlwidgets)
+```
+
+## Loading the Data
+
+Cleaned data with groupings are taken from the previous analysis, *Fishy Businesses*:
+
+```{r}
+#| code-fold: false
+mc3_links_new <- read_csv("data/mc3_links_new.csv")
+mc3_nodes_all <- read_csv("data/mc3_shinynodes.csv")
+```
+
+# Companies by Industry
+
+The following groups were derived from topic modeling of products and services offered by companies in the data:
+
+| **Topic**\nNo. | **Industry**        | **Description**                                                 |
+|:---------------:|-----------------|---------------------------------------|
+|     **1**      | Industrial          | Manages equipment, machinery and other industrial materials     |
+|     **2**      | Food                | Vegetables, meat, fruits and other groceries                    |
+|     **3**      | Seafood-processing  | Packaging, canning, manufacturing of marine or seafood products |
+|     **4**      | Consumer-goods      | Non-fishing related accessories, furniture, apparel             |
+|     **5**      | Transport-logistics | Companies specialising in logistics, freight, cargo services    |
+|     **6**      | Fishing             | Companies directly related to fishing of salmon, tuna, etc      |
+
+As there were some companies that had a high probability of being classified under more than a single industry, these were grouped together as a separate category, **multi-industry companies**.
+
+::: panel-tabset
+
+## **I. Filter records belonging to companies in different industries**
+
+Create separate dataframes for nodes in each Industry to use as filters for **links** data. 
+
+```{r}
+#| code-fold: false
+# Overall Company nodes
+nodes_industry <- mc3_nodes_all %>%
+  filter(grepl("company", group, ignore.case = TRUE) & group != "Company Contact")
+
+# industrial companies
+nodes_industrial <- nodes_industry %>%
+  filter(group == "Industrial Company")
+
+# Food companies
+nodes_food <- nodes_industry %>%
+  filter(group == "Food Company")
+
+# Seafood-processing companies
+nodes_seafood <- nodes_industry %>%
+  filter(group == "Seafood-processing Company")
+
+# Consumer-goods companies
+nodes_goods <- nodes_industry %>%
+  filter(group == "Consumer-goods Company")
+
+# Transport Logistics companies
+nodes_transport <- nodes_industry %>%
+  filter(group == "Transport-logistics Company")
+
+# fishing-related companies
+nodes_fishing <- nodes_industry %>%
+  filter(group == "Fishing-related Company")
+
+# multi-industry companies
+nodes_multi <- nodes_industry %>%
+  filter(group == "Multi-Industry Company")
+```
+
+## **II. Filter links belonging to those companies**  
+
+Get links data of Individuals linked to each company in the each industry
+
+```{r}
+#| code-fold: false
+# Overall company links
+links_industry <- mc3_links_new %>%
+  filter(source %in% nodes_industry$id)
+
+# industrial companies
+links_industrial <- mc3_links_new %>%
+  filter(source %in% nodes_industrial$id)
+
+# Food companies
+links_food <- mc3_links_new %>%
+  filter(source %in% nodes_food$id)
+
+# Seafood-processing companies
+links_seafood <- mc3_links_new %>%
+  filter(source %in% nodes_seafood$id)
+
+# Consumer-goods companies
+links_goods <- mc3_links_new %>%
+  filter(source %in% nodes_goods$id)
+
+# Transport Logistics companies
+links_transport <- mc3_links_new %>%
+  filter(source %in% nodes_transport$id)
+
+# fishing-related companies
+links_fishing <- mc3_links_new %>%
+  filter(source %in% nodes_fishing$id)
+
+# multi-industry companies
+links_multi <- mc3_links_new %>%
+  filter(source %in% nodes_multi$id)
+```
+
+## **III. Get unique source and target from filtered links**
+
+```{r}
+# Overall Companies
+links_source <- links_industry %>%
+  distinct(source) %>%
+  rename("id" = "source")
+
+links_target <- links_industry %>%
+  distinct(target) %>%
+  rename("id" = "target")
+
+# industrial companies
+links_source1 <- links_industrial %>%
+  distinct(source) %>%
+  rename("id" = "source")
+
+links_target1 <- links_industrial %>%
+  distinct(target) %>%
+  rename("id" = "target")
+
+# Food companies
+links_source2 <- links_food %>%
+  distinct(source) %>%
+  rename("id" = "source")
+
+links_target2 <- links_food %>%
+  distinct(target) %>%
+  rename("id" = "target")
+
+# Seafood-processing companies
+links_source3 <- links_seafood %>%
+  distinct(source) %>%
+  rename("id" = "source")
+
+links_target3 <- links_seafood %>%
+  distinct(target) %>%
+  rename("id" = "target")
+
+# Consumer-goods companies
+links_source4 <- links_goods %>%
+  distinct(source) %>%
+  rename("id" = "source")
+
+links_target4 <- links_goods %>%
+  distinct(target) %>%
+  rename("id" = "target")
+
+# Transport Logistics companies
+links_source5 <- links_transport %>%
+  distinct(source) %>%
+  rename("id" = "source")
+
+links_target5 <- links_transport %>%
+  distinct(target) %>%
+  rename("id" = "target")
+
+# fishing-related companies
+links_source6 <- links_fishing %>%
+  distinct(source) %>%
+  rename("id" = "source")
+
+links_target6 <- links_fishing %>%
+  distinct(target) %>%
+  rename("id" = "target")
+
+# multi-industry companies
+links_source7 <- links_multi %>%
+  distinct(source) %>%
+  rename("id" = "source")
+
+links_target7 <- links_multi %>%
+  distinct(target) %>%
+  rename("id" = "target")
+```
+
+## **IV. Bind links together to get overall nodes dataframe**
+
+```{r}
+# Overall Companies
+nodes_industry_new <- bind_rows(links_source, links_target) %>%
+  left_join(mc3_nodes_all, by = "id") %>%
+  select(id, group, revenue_group, transboundary)
+
+# industrial companies
+nodes_industrial_new <- bind_rows(links_source1, links_target1) %>%
+  left_join(mc3_nodes_all, by = "id") %>%
+  select(id, group, revenue_group, transboundary)
+
+# Food companies
+nodes_food_new <- bind_rows(links_source2, links_target2) %>%
+  left_join(mc3_nodes_all, by = "id") %>%
+  select(id, group, revenue_group, transboundary)
+
+# Seafood-processing companies
+nodes_seafood_new <- bind_rows(links_source3, links_target3) %>%
+  left_join(mc3_nodes_all, by = "id") %>%
+  select(id, group, revenue_group, transboundary)
+
+# Consumer-goods companies
+nodes_goods_new <- bind_rows(links_source4, links_target4) %>%
+  left_join(mc3_nodes_all, by = "id") %>%
+  select(id, group, revenue_group, transboundary)
+
+# Transport Logistics companies
+nodes_transport_new <- bind_rows(links_source5, links_target5) %>%
+  left_join(mc3_nodes_all, by = "id") %>%
+  select(id, group, revenue_group, transboundary)
+
+# fishing-related companies
+nodes_fishing_new <- bind_rows(links_source6, links_target6) %>%
+  left_join(mc3_nodes_all, by = "id") %>%
+  select(id, group, revenue_group, transboundary)
+
+# multi-industry companies
+nodes_multi_new <- bind_rows(links_source7, links_target7) %>%
+  left_join(mc3_nodes_all, by = "id") %>%
+  select(id, group, revenue_group, transboundary)
+
+```
+
+
+
+## **V. Create Graph Objects**
+
+```{r}
+#| code-fold: false
+# Overall company graph
+industry_graph <- tbl_graph(nodes = nodes_industry_new,
+                            edges = links_industry, 
+                            directed = FALSE)
+
+# industrial companies
+industrial_graph <- tbl_graph(nodes = nodes_industrial_new,
+                            edges = links_industrial, 
+                            directed = FALSE)
+```
+
+:::
+
+```{r}
+#| fig-width: 8
+#| fig-height: 7
+# Measure degree centrality and save as a column
+V(industrial_graph)$degree <- degree(industrial_graph, mode = "all")
+
+set.seed(1234)
+industrial_network <- industrial_graph %>%
+  ggraph(layout = "nicely") +
+  geom_edge_fan(
+    alpha = .6,
+    show.legend = FALSE
+  ) +
+  scale_edge_width(
+    range = c(0.1,4)
+  ) +
+  geom_node_point(
+    aes(size = degree,
+        color = group),
+    alpha = .9
+  ) +
+  # Remove the legend for "degree"
+  guides(color = guide_legend(title = "Role:"),
+         size = "none"
+  ) + 
+  geom_node_text(
+    aes(label = ifelse(degree > quantile(degree, .75), id, "")), 
+    size = 2,
+    repel = TRUE
+  ) +
+  labs(
+    title = "Industrial Company Network"
+  ) +
+  theme(
+    plot.title = element_text(size = 16,
+                              color = "grey20"),
+    legend.title = element_text(),
+    legend.position = "bottom",
+    # legend.direction = "horizontal",
+    legend.background = element_rect(fill="#dfdfeb",colour="#dfdfeb"),
+    panel.background = element_rect(fill="#dfdfeb",colour="#dfdfeb"),
+    plot.background = element_rect(fill="#dfdfeb",colour="#dfdfeb"),
+    plot.margin = margin(r = 10,
+                         l = 10)
+  )
+
+industrial_network
+```
+
