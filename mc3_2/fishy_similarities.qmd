@@ -9,7 +9,6 @@ format:
     message: false
 ---
 
-
 <font size = "5">**VAST Challenge 2023: Mini-Challenge 3**</font>
 
 # Project Brief
@@ -28,8 +27,9 @@ This study aims to use visual analytics to
 ## R Packages
 
 ```{r intstall-packages}
+#| code-fold: false
 #| message: false
-pacman::p_load(tidyverse, DescTools, skimr, ggrepel, DT, kableExtra, ggplot2, scales, ggthemes, visNetwork, ggraph, igraph, gganimate, tidygraph, ggrain, patchwork, ggpubr, htmlwidgets)
+pacman::p_load(tidyverse, ggrepel, DT, kableExtra, ggplot2, scales, ggthemes, visNetwork, ggraph, igraph, gganimate, tidygraph, ggrain, patchwork, ggpubr, htmlwidgets)
 ```
 
 ## Loading the Data
@@ -42,12 +42,12 @@ mc3_links_new <- read_csv("data/mc3_links_new.csv")
 mc3_nodes_all <- read_csv("data/mc3_shinynodes.csv")
 ```
 
-# Companies by Industry
+# Network Structures By Industry
 
 The following groups were derived from topic modeling of products and services offered by companies in the data:
 
 | **Topic**\nNo. | **Industry**        | **Description**                                                 |
-|:---------------:|-----------------|---------------------------------------|
+|:----------------:|------------------|-------------------------------------|
 |     **1**      | Industrial          | Manages equipment, machinery and other industrial materials     |
 |     **2**      | Food                | Vegetables, meat, fruits and other groceries                    |
 |     **3**      | Seafood-processing  | Packaging, canning, manufacturing of marine or seafood products |
@@ -58,10 +58,9 @@ The following groups were derived from topic modeling of products and services o
 As there were some companies that had a high probability of being classified under more than a single industry, these were grouped together as a separate category, **multi-industry companies**.
 
 ::: panel-tabset
-
 ## **I. Filter records belonging to companies in different industries**
 
-Create separate dataframes for nodes in each Industry to use as filters for **links** data. 
+Create separate dataframes for nodes in each Industry to use as filters for **links** data.
 
 ```{r}
 #| code-fold: false
@@ -98,7 +97,7 @@ nodes_multi <- nodes_industry %>%
   filter(group == "Multi-Industry Company")
 ```
 
-## **II. Filter links belonging to those companies**  
+## **II. Filter links belonging to those companies**
 
 Get links data of Individuals linked to each company in the each industry
 
@@ -258,8 +257,6 @@ nodes_multi_new <- bind_rows(links_source7, links_target7) %>%
 
 ```
 
-
-
 ## **V. Create Graph Objects**
 
 ```{r}
@@ -271,17 +268,57 @@ industry_graph <- tbl_graph(nodes = nodes_industry_new,
 
 # industrial companies
 industrial_graph <- tbl_graph(nodes = nodes_industrial_new,
-                            edges = links_industrial, 
-                            directed = FALSE)
-```
+                              edges = links_industrial, 
+                              directed = FALSE)
 
+# food companies
+food_graph <- tbl_graph(nodes = nodes_food_new,
+                        edges = links_food, 
+                        directed = FALSE)
+
+# Seafood-processing companies
+seafood_graph <- tbl_graph(nodes = nodes_seafood_new,
+                          edges = links_seafood, 
+                          directed = FALSE)
+
+# Consumer-goods companies
+goods_graph <- tbl_graph(nodes = nodes_goods_new,
+                        edges = links_goods, 
+                        directed = FALSE)
+
+# Transport Logistics companies
+transport_graph <- tbl_graph(nodes = nodes_transport_new,
+                            edges = links_transport, 
+                            directed = FALSE)
+
+# fishing-related companies
+fishing_graph <- tbl_graph(nodes = nodes_fishing_new,
+                          edges = links_fishing, 
+                          directed = FALSE)
+
+# multi-industry companies
+multi_graph <- tbl_graph(nodes = nodes_multi_new,
+                          edges = links_multi, 
+                          directed = FALSE)
+```
 :::
+
+::: panel-tabset
+
+## **Industrial Companies**
 
 ```{r}
 #| fig-width: 8
 #| fig-height: 7
 # Measure degree centrality and save as a column
 V(industrial_graph)$degree <- degree(industrial_graph, mode = "all")
+
+# Define custom colors for each group
+group_colors <- c("Ultimate Beneficial Owner" = "#D86171" , 
+                  "Shareholder" = "#163759", 
+                  "Company Contact" = "#F39C12" , 
+                  "Multi-role Entity" = "#48C9B0", 
+                  "Industrial Company" = "#2980B9")
 
 set.seed(1234)
 industrial_network <- industrial_graph %>%
@@ -294,7 +331,8 @@ industrial_network <- industrial_graph %>%
     range = c(0.1,4)
   ) +
   geom_node_point(
-    aes(size = degree,
+    # Ensure that UBO and Multi-role entity nodes can be clearly seen by making node size larger
+    aes(size = ifelse(group == "Ultimate Beneficial Owner" | group == "Multi-role Entity", 3, degree),
         color = group),
     alpha = .9
   ) +
@@ -302,6 +340,9 @@ industrial_network <- industrial_graph %>%
   guides(color = guide_legend(title = "Role:"),
          size = "none"
   ) + 
+  # Assign custom colors to each group to standardise
+  scale_color_manual(values = group_colors) + 
+  # Only label companies in top 25th percentile of degree measure
   geom_node_text(
     aes(label = ifelse(degree > quantile(degree, .75), id, "")), 
     size = 2,
@@ -326,3 +367,445 @@ industrial_network <- industrial_graph %>%
 industrial_network
 ```
 
+## **Food Companies**
+
+```{r}
+#| fig-width: 8
+#| fig-height: 7
+# Measure degree centrality and save as a column
+V(food_graph)$degree <- degree(food_graph, mode = "all")
+
+# Define custom colors for each group
+group_colors <- c("Ultimate Beneficial Owner" = "#D86171" , 
+                  "Shareholder" = "#163759", 
+                  "Company Contact" = "#F39C12" , 
+                  "Multi-role Entity" = "#48C9B0", 
+                  "Food Company" = "grey40")
+
+set.seed(1234)
+food_network <- food_graph %>%
+  ggraph(layout = "nicely") +
+  geom_edge_fan(
+    alpha = .6,
+    show.legend = FALSE
+  ) +
+  scale_edge_width(
+    range = c(0.1,4)
+  ) +
+  geom_node_point(
+    aes(size = ifelse(group == "Ultimate Beneficial Owner" | group == "Multi-role Entity", 3, degree),
+        color = group),
+    alpha = .9
+  ) +
+  # Remove the legend for "degree"
+  guides(color = guide_legend(title = "Role:"),
+         size = "none"
+  ) + 
+   # Assign custom colors to each group to standardise
+  scale_color_manual(values = group_colors) + 
+  geom_node_text(
+    aes(label = ifelse(degree > quantile(degree, .75), id, "")), 
+    size = 2,
+    repel = TRUE
+  ) +
+  labs(
+    title = "Food Industry Network"
+  ) +
+  theme(
+    plot.title = element_text(size = 16,
+                              color = "grey20"),
+    legend.title = element_text(),
+    legend.position = "bottom",
+    # legend.direction = "horizontal",
+    legend.background = element_rect(fill="#dfdfeb",colour="#dfdfeb"),
+    panel.background = element_rect(fill="#dfdfeb",colour="#dfdfeb"),
+    plot.background = element_rect(fill="#dfdfeb",colour="#dfdfeb"),
+    plot.margin = margin(r = 10,
+                         l = 10)
+  )
+
+food_network
+```
+
+## **Seafood Processing Companies**
+
+```{r}
+#| fig-width: 8
+#| fig-height: 7
+# Measure degree centrality and save as a column
+V(seafood_graph)$degree <- degree(seafood_graph, mode = "all")
+
+# Define custom colors for each group
+group_colors <- c("Ultimate Beneficial Owner" = "#D86171" , 
+                  "Shareholder" = "#163759", 
+                  "Company Contact" = "#F39C12" , 
+                  "Multi-role Entity" = "#48C9B0", 
+                  "Seafood-processing Company" = "#B78EA4")
+
+set.seed(1234)
+seafood_network <- seafood_graph %>%
+  ggraph(layout = "nicely") +
+  geom_edge_fan(
+    alpha = .6,
+    show.legend = FALSE
+  ) +
+  scale_edge_width(
+    range = c(0.1,4)
+  ) +
+  geom_node_point(
+    aes(size = ifelse(group == "Ultimate Beneficial Owner" | group == "Multi-role Entity", 3, degree),
+        color = group),
+    alpha = .9
+  ) +
+  # Remove the legend for "degree"
+  guides(color = guide_legend(title = "Role:"),
+         size = "none"
+  ) + 
+   # Assign custom colors to each group to standardise
+  scale_color_manual(values = group_colors) + 
+  geom_node_text(
+    aes(label = ifelse(degree > quantile(degree, .75), id, "")), 
+    size = 2,
+    repel = TRUE
+  ) +
+  labs(
+    title = "Seafood-Processing Industry Network"
+  ) +
+  theme(
+    plot.title = element_text(size = 16,
+                              color = "grey20"),
+    legend.title = element_text(),
+    legend.position = "bottom",
+    # legend.direction = "horizontal",
+    legend.background = element_rect(fill="#dfdfeb",colour="#dfdfeb"),
+    panel.background = element_rect(fill="#dfdfeb",colour="#dfdfeb"),
+    plot.background = element_rect(fill="#dfdfeb",colour="#dfdfeb"),
+    plot.margin = margin(r = 10,
+                         l = 10)
+  )
+
+seafood_network
+```
+
+## **Consumer Goods Companies**
+
+```{r}
+#| fig-width: 8
+#| fig-height: 7
+# Measure degree centrality and save as a column
+V(goods_graph)$degree <- degree(goods_graph, mode = "all")
+
+# Define custom colors for each group
+group_colors <- c("Ultimate Beneficial Owner" = "#D86171" , 
+                  "Shareholder" = "#163759", 
+                  "Company Contact" = "#F39C12" , 
+                  "Multi-role Entity" = "#48C9B0", 
+                  "Consumer-goods Company" = "#138D75")
+
+set.seed(1234)
+goods_network <- goods_graph %>%
+  ggraph(layout = "nicely") +
+  geom_edge_fan(
+    alpha = .6,
+    show.legend = FALSE
+  ) +
+  scale_edge_width(
+    range = c(0.1,4)
+  ) +
+  geom_node_point(
+    aes(size = ifelse(group == "Ultimate Beneficial Owner" | group == "Multi-role Entity", 3, degree),
+        color = group),
+    alpha = .9
+  ) +
+  # Remove the legend for "degree"
+  guides(color = guide_legend(title = "Role:"),
+         size = "none"
+  ) + 
+   # Assign custom colors to each group to standardise
+  scale_color_manual(values = group_colors) + 
+  geom_node_text(
+    aes(label = ifelse(degree > quantile(degree, .75), id, "")), 
+    size = 2,
+    repel = TRUE
+  ) +
+  labs(
+    title = "Consumer Goods Industry Network"
+  ) +
+  theme(
+    plot.title = element_text(size = 16,
+                              color = "grey20"),
+    legend.title = element_text(),
+    legend.position = "bottom",
+    # legend.direction = "horizontal",
+    legend.background = element_rect(fill="#dfdfeb",colour="#dfdfeb"),
+    panel.background = element_rect(fill="#dfdfeb",colour="#dfdfeb"),
+    plot.background = element_rect(fill="#dfdfeb",colour="#dfdfeb"),
+    plot.margin = margin(r = 10,
+                         l = 10)
+  )
+
+goods_network
+```
+
+## **Transport & Logistics Companies**
+
+```{r}
+#| fig-width: 8
+#| fig-height: 7
+# Measure degree centrality and save as a column
+V(transport_graph)$degree <- degree(transport_graph, mode = "all")
+
+# Define custom colors for each group
+group_colors <- c("Ultimate Beneficial Owner" = "#D86171" , 
+                  "Shareholder" = "#163759", 
+                  "Company Contact" = "#F39C12" , 
+                  "Multi-role Entity" = "#48C9B0", 
+                  "Transport-logistics Company" = "#85929E")
+
+set.seed(1234)
+transport_network <- transport_graph %>%
+  ggraph(layout = "nicely") +
+  geom_edge_fan(
+    alpha = .6,
+    show.legend = FALSE
+  ) +
+  scale_edge_width(
+    range = c(0.1,4)
+  ) +
+  geom_node_point(
+    aes(size = ifelse(group == "Ultimate Beneficial Owner" | group == "Multi-role Entity", 3, degree),
+        color = group),
+    alpha = .9
+  ) +
+  # Remove the legend for "degree"
+  guides(color = guide_legend(title = "Role:"),
+         size = "none"
+  ) + 
+   # Assign custom colors to each group to standardise
+  scale_color_manual(values = group_colors) + 
+  geom_node_text(
+    aes(label = ifelse(degree > quantile(degree, .75), id, "")), 
+    size = 2,
+    repel = TRUE
+  ) +
+  labs(
+    title = "Transport and Logistics Industry Network"
+  ) +
+  theme(
+    plot.title = element_text(size = 16,
+                              color = "grey20"),
+    legend.title = element_text(),
+    legend.position = "bottom",
+    # legend.direction = "horizontal",
+    legend.background = element_rect(fill="#dfdfeb",colour="#dfdfeb"),
+    panel.background = element_rect(fill="#dfdfeb",colour="#dfdfeb"),
+    plot.background = element_rect(fill="#dfdfeb",colour="#dfdfeb"),
+    plot.margin = margin(r = 10,
+                         l = 10)
+  )
+
+transport_network
+```
+## **Fishing-related Companies**
+
+```{r}
+#| fig-width: 8
+#| fig-height: 7
+# Measure degree centrality and save as a column
+V(fishing_graph)$degree <- degree(fishing_graph, mode = "all")
+
+# Define custom colors for each group
+group_colors <- c("Ultimate Beneficial Owner" = "#D86171" , 
+                  "Shareholder" = "#163759", 
+                  "Company Contact" = "#F39C12" , 
+                  "Multi-role Entity" = "#48C9B0",  
+                  "Fishing-related Company" = "#629DBB")
+
+set.seed(1234)
+fishing_network <- fishing_graph %>%
+  ggraph(layout = "nicely") +
+  geom_edge_fan(
+    alpha = .6,
+    show.legend = FALSE
+  ) +
+  scale_edge_width(
+    range = c(0.1,4)
+  ) +
+  geom_node_point(
+    aes(size = ifelse(group == "Ultimate Beneficial Owner" | group == "Multi-role Entity", 3, degree),
+        color = group),
+    alpha = .9
+  ) +
+  # Remove the legend for "degree"
+  guides(color = guide_legend(title = "Role:"),
+         size = "none"
+  ) + 
+   # Assign custom colors to each group to standardise
+  scale_color_manual(values = group_colors) + 
+  geom_node_text(
+    aes(label = ifelse(degree > quantile(degree, .75), id, "")), 
+    size = 2,
+    repel = TRUE
+  ) +
+  labs(
+    title = "Fishing-related Industry Network"
+  ) +
+  theme(
+    plot.title = element_text(size = 16,
+                              color = "grey20"),
+    legend.title = element_text(),
+    legend.position = "bottom",
+    # legend.direction = "horizontal",
+    legend.background = element_rect(fill="#dfdfeb",colour="#dfdfeb"),
+    panel.background = element_rect(fill="#dfdfeb",colour="#dfdfeb"),
+    plot.background = element_rect(fill="#dfdfeb",colour="#dfdfeb"),
+    plot.margin = margin(r = 10,
+                         l = 10)
+  )
+
+fishing_network
+```
+
+## **Multi-industry Companies**
+
+```{r}
+#| fig-width: 8
+#| fig-height: 7
+# Measure degree centrality and save as a column
+V(multi_graph)$degree <- degree(multi_graph, mode = "all")
+
+# Define custom colors for each group
+group_colors <- c("Ultimate Beneficial Owner" = "#D86171" , 
+                  "Shareholder" = "#163759", 
+                  "Company Contact" = "#F39C12" , 
+                  "Multi-role Entity" = "#48C9B0", 
+                  "Multi-Industry Company" = "#766F87")
+
+set.seed(1234)
+multi_network <- multi_graph %>%
+  ggraph(layout = "nicely") +
+  geom_edge_fan(
+    alpha = .6,
+    show.legend = FALSE
+  ) +
+  scale_edge_width(
+    range = c(0.1,4)
+  ) +
+  geom_node_point(
+    aes(size = ifelse(group == "Ultimate Beneficial Owner" | group == "Multi-role Entity", 3, degree),
+        color = group),
+    alpha = .9
+  ) +
+  # Remove the legend for "degree"
+  guides(color = guide_legend(title = "Role:"),
+         size = "none"
+  ) + 
+   # Assign custom colors to each group to standardise
+  scale_color_manual(values = group_colors) + 
+  geom_node_text(
+    aes(label = ifelse(degree > quantile(degree, .75), id, "")), 
+    size = 2,
+    repel = TRUE
+  ) +
+  labs(
+    title = "Multi-industry Company Network"
+  ) +
+  theme(
+    plot.title = element_text(size = 16,
+                              color = "grey20"),
+    legend.title = element_text(),
+    legend.position = "bottom",
+    # legend.direction = "horizontal",
+    legend.background = element_rect(fill="#dfdfeb",colour="#dfdfeb"),
+    panel.background = element_rect(fill="#dfdfeb",colour="#dfdfeb"),
+    plot.background = element_rect(fill="#dfdfeb",colour="#dfdfeb"),
+    plot.margin = margin(r = 10,
+                         l = 10)
+  )
+
+multi_network
+```
+:::
+
+# Jaccard Similarity of Industry-classified Networks  
+
+The **Jaccard similarity index** compares the similarity of two networks on a scale of 0 to 1. The higher the index, the closer the two sets of data are.
+
+::: panel-tabset
+
+## **I. Define Jaccard Simmilarity Function**
+
+```{r}
+#| code-fold: false
+# Store all graph objects as a list
+all_industries <- list(industrial_graph, food_graph, seafood_graph, goods_graph, transport_graph, fishing_graph, multi_graph)
+
+# Create function to calculate jaccard similarity between two network graphs
+jaccard_sim <- function(graph1, graph2) {
+  common_edges <- intersect(E(graph1), E(graph2))
+  jaccard_similarity <- length(common_edges) / (length(E(graph1)) + length(E(graph2)) - length(common_edges))
+  return(jaccard_similarity)
+}
+```
+
+## **II. Loop through each Network Graph pair**
+
+```{r}
+#| code-fold: false
+# Loop through all network graphs and calculate jaccard similarity
+jaccard_similarity <- matrix(0, nrow = length(all_industries), ncol = length(all_industries))
+for (i in 1:length(all_industries)) {
+  for (j in 1:length(all_industries)) {
+    jaccard_similarity[i, j] <- jaccard_sim(all_industries[[i]], all_industries[[j]])
+  }
+}
+```
+
+## **III. Create Jaccard Similarity Matrix**
+
+```{r}
+# Create dataframe with jaccard similarity matrix
+jaccard_similarity_df <- as.data.frame(jaccard_similarity)
+
+# Assign row and column names according to industry
+network_titles <- c("Industrial", "Food", "Seafood", "Goods", "Transport", "Fishing", "Multi-industry")
+rownames(jaccard_similarity_df) <- network_titles
+colnames(jaccard_similarity_df) <- network_titles
+
+kbl(jaccard_similarity_df,
+    caption = "Jaccard Similarity Index Comparing Network Graphs") %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"))
+```
+
+:::
+
+```{r}
+#| fig-width: 8
+#| fig-height: 7
+# Visualize the Jaccard similarity matrix as a heatmap
+pacman::p_load(heatmaply)
+heatmaply(as.matrix(jaccard_similarity_df),
+          colors = Blues,
+          seriate = "OLO",
+          main="Jaccard Similarity Scores Comparing Industry Networks",
+          margins = c(NA,200,60,NA)
+          ) %>%
+  plotly::layout(plot_bgcolor = "#dfdfeb",
+                paper_bgcolor = "#dfdfeb")
+```  
+
+
+::: {.alertbox .alert data-latex="alert"}
+
+**Similarities in Network Structures Across Industries:**
+Similarities in Network structure can be derived from Jaccard Similarity (JS) scores presented in the heatmap. The lighter the tile, the less similar these 'groups' are. 
+
+- **Highly similar industries:**  
+  - **Multi-industry & Consumer Goods** as well as **Fishing & Seafood-processing Industries** have the highest JS index of nearly 1.0, suggestive of almost the same network structures. 
+  - The networks of **Multi-industry & Consumer Goods** feature Ultimate Beneficial Owners, as well as multiple companies with large numbers of shareholders within the network structure
+  - **Fishing & Seafood-processing Industries** networks are void of Ultimate Beneficial Owners, but feature multi-role entities and fewer peripheral 'clusters'
+
+:::
+
+
+  

@@ -985,7 +985,7 @@ ggplot(
 **The companies can generally be classified under these 6 Industries:**
 
 | **Topic**\nNo. | **Industry**        | **Description**                                                 |
-|:---------------:|-----------------|---------------------------------------|
+|:----------------:|------------------|-------------------------------------|
 |     **1**      | Industrial          | Manages equipment, machinery and other industrial materials     |
 |     **2**      | Food                | Vegetables, meat, fruits and other groceries                    |
 |     **3**      | Seafood-processing  | Packaging, canning, manufacturing of marine or seafood products |
@@ -1143,6 +1143,7 @@ Revealing the company ownership and company contact structure through network gr
 -   Beneficial Owners of higher number of Companies
 -   Company Contacts of higher number of Companies
 -   Companies with Transboundary Operations
+
 :::
 
 ## Companies with High Revenue & High Number of Beneficial Owners
@@ -1200,9 +1201,10 @@ nodes_hirev_new$group <- ifelse(nodes_hirev_new$id %in% links_highrev$to,"Benefi
 ```
 :::
 
-```{r}
+```{r net1}
 #| fig-width: 8
-visNetwork(
+net1 <- 
+  visNetwork(
     nodes_hirev_new, 
     links_highrev,
     width = "100%",
@@ -1235,6 +1237,8 @@ visNetwork(
     selectedBy = "group",
     collapse = TRUE) %>%
   visInteraction(navigationButtons = TRUE)
+
+net1
 ```
 
 .
@@ -1244,6 +1248,7 @@ visNetwork(
 
 -   Drakensberg Limited Liability Company & Haryana S Catchers OAO Enterprises
 -   shi ren yu Barge & Isla del Este Ltd
+
 :::
 
 ## Beneficial Owners of 3 or More Companies
@@ -1299,9 +1304,10 @@ owner_nodes$group <- ifelse(owner_nodes$id %in% owner_count$target, "Beneficial 
 ```
 :::
 
-```{r}
+```{r net2}
 #| fig-width: 8
-visNetwork(
+net2 <-
+  visNetwork(
     owner_nodes, 
     links_owner,
     width = "100%",
@@ -1334,6 +1340,8 @@ visNetwork(
     selectedBy = "group",
     collapse = TRUE) %>%
   visInteraction(navigationButtons = TRUE)
+
+net2
 ```
 
 ::: {.alertbox .alert data-latex="alert"}
@@ -1345,8 +1353,8 @@ There are 2 particularly *fishy* structures present in the network: completely o
     -   Mar de la Aventura Tidepool, Ocean Quest CJSC Import & Sea Seekers SE Marine biology
     -   Belgian Scallop Charter Boat Inc Freight, Delphinia Seagrass GmbH Marine sanctuary & Irish Trout Inc Solutions
 -   **Interlinked Networks**
-    -   Fisher Marine conservation CJSC Transportation co-owned by Mathew Mora & Anthony Harris
-    -   SeaSplash Foods Corporation Freight & Beachcombers Nautical Plc Carriers, co-owned by Elizabeth Henderson & John Smith
+    -   Fisher Marine conservation CJSC Transportation co-owned by **Mathew Mora & Anthony Harris**
+    -   SeaSplash Foods Corporation Freight & Beachcombers Nautical Plc Carriers, co-owned by **Elizabeth Henderson & John Smith**
 :::
 
 ## Company Contacts of 3 or more Companies
@@ -1402,9 +1410,10 @@ cc_nodes$group <- ifelse(cc_nodes$id %in% cc_count$target, "Company Contacts", "
 ```
 :::
 
-```{r}
+```{r net3}
 #| fig-width: 8
-visNetwork(
+net3 <-
+  visNetwork(
     cc_nodes, 
     links_cc,
     width = "100%",
@@ -1437,7 +1446,26 @@ visNetwork(
     selectedBy = "group",
     collapse = TRUE) %>%
   visInteraction(navigationButtons = TRUE)
-```
+
+net3
+```  
+  
+  
+  
+   
+::: {.alertbox .alert data-latex="alert"}
+
+**Anomalous Company Structures of Company Contacts:**\
+Similar to the structures present in the Beneficial Ownership networks, there are 2 *fishy* structures to highlight: shared company contacts (completely overlapping company contacts) among multiple companies and interlinked company contact networks (split networks linked by contacts to a similar company). 
+
+-   **Shared Company Contacts**
+    -   **Megan Brooks & John Koch** are both company contacts of Atlantico Sur Corporation Breakwater, Guinea Gulf America AS & Son's and Nautica del Sol Pelican
+    -   **Sarah Valentine & Caleb Morrow** are both company contacts of Dnipro & CJSC Consultants, Cape Verde Islands Marine Life and Marine Mermaids Incorporated Consultants
+-   **Interlinked Networks**
+    -   **Sean Baxter & Daniel Rodriguez** are both company contacts of Greek Octobus Limited Liability Company
+    -   **Gregory Kennedy & Justin Robles DDS** are both company contacts of Playa de la Luna CJSC and Kerala Market Tidal flat
+    
+:::
 
 ## Companies with Transboundary Operations
 
@@ -1506,8 +1534,9 @@ trans_nodes_new$group <- ifelse(trans_nodes_new$id %in% nodes_country$id, "Compa
 ```
 :::
 
-```{r}
-visNetwork(
+```{r net4}
+net4 <-
+  visNetwork(
     trans_nodes_new, 
     trans_links,
     width = "100%",
@@ -1546,7 +1575,21 @@ visNetwork(
     selectedBy = "group",
     collapse = TRUE) %>%
   visInteraction(navigationButtons = TRUE)
-```
+
+net4
+```  
+
+  
+   
+::: {.alertbox .alert data-latex="alert"}
+
+**No Presence of Interlinked Networks for Transboundary Operations:**\
+Unlike the previous networks of Beneficial Ownership and Company Contacts, there seem to be no interlinks between companies with transboundary operations.  
+
+- **Aqua Aura SE Marine life**, the company with highest number of operating countries, is only linked to 3 Beneficial Owners and 3 Company Contacts, none of whom were flagged out in previous *fishy* network structures
+- Lack of interlinks suggest that anomalous structures may be more efficiently scoped out through examining other variables instead. 
+
+:::
 
 # A Fishy Network: Shiny App
 
@@ -1555,7 +1598,7 @@ Exploratory analysis thus far has revealed some underlying structures of various
 The "group" that the entity is assigned is based on the following roles:
 
 | Group                         | Logic                                                                                        |
-|--------------------|----------------------------------------------------|
+|---------------------|---------------------------------------------------|
 | **Ultimate Beneficial Owner** | Beneficial Owner of \> 3 Companies, a key player in the network                              |
 | **Multi-role Entity**         | Plays multiple roles within the network, may be a key personnel or broker within the network |
 | **Shareholder**               | Beneficial Owner with a stake in a company                                                   |
@@ -1641,7 +1684,8 @@ final_nodes_update <- final_nodes %>%
 final_nodes_update <- bind_rows(final_nodes_update, link_overlaps, links_target) 
 final_nodes_update$group <- ifelse(is.na(final_nodes_update$group), "unknown", final_nodes_update$group)
 ```
-:::
+:::  
+.  
 
 **References**
 

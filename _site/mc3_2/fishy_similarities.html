@@ -123,6 +123,17 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
   }
 }</script>
 
+<script src="../site_libs/kePrint-0.0.1/kePrint.js"></script>
+<link href="../site_libs/lightable-0.0.1/lightable.css" rel="stylesheet">
+<script src="../site_libs/htmlwidgets-1.6.2/htmlwidgets.js"></script>
+<script src="../site_libs/plotly-binding-4.10.2/plotly.js"></script>
+<script src="../site_libs/typedarray-0.1/typedarray.min.js"></script>
+<script src="../site_libs/jquery-3.5.1/jquery.min.js"></script>
+<link href="../site_libs/crosstalk-1.2.0/css/crosstalk.min.css" rel="stylesheet">
+<script src="../site_libs/crosstalk-1.2.0/js/crosstalk.min.js"></script>
+<link href="../site_libs/plotly-htmlwidgets-css-2.11.1/plotly-htmlwidgets.css" rel="stylesheet">
+<script src="../site_libs/plotly-main-2.11.1/plotly-latest.min.js"></script>
+
 
 <link rel="stylesheet" href="../styles.css">
 </head>
@@ -196,7 +207,8 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
   <li><a href="#r-packages" id="toc-r-packages" class="nav-link" data-scroll-target="#r-packages"><span class="toc-section-number">2.1</span>  R Packages</a></li>
   <li><a href="#loading-the-data" id="toc-loading-the-data" class="nav-link" data-scroll-target="#loading-the-data"><span class="toc-section-number">2.2</span>  Loading the Data</a></li>
   </ul></li>
-  <li><a href="#companies-by-industry" id="toc-companies-by-industry" class="nav-link" data-scroll-target="#companies-by-industry"><span class="toc-section-number">3</span>  Companies by Industry</a></li>
+  <li><a href="#network-structures-by-industry" id="toc-network-structures-by-industry" class="nav-link" data-scroll-target="#network-structures-by-industry"><span class="toc-section-number">3</span>  Network Structures By Industry</a></li>
+  <li><a href="#jaccard-similarity-of-industry-classified-networks" id="toc-jaccard-similarity-of-industry-classified-networks" class="nav-link" data-scroll-target="#jaccard-similarity-of-industry-classified-networks"><span class="toc-section-number">4</span>  Jaccard Similarity of Industry-classified Networks</a></li>
   </ul>
 </nav>
     </div>
@@ -222,10 +234,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <section id="r-packages" class="level2" data-number="2.1">
 <h2 data-number="2.1" class="anchored" data-anchor-id="r-packages"><span class="header-section-number">2.1</span> R Packages</h2>
 <div class="cell">
-<details>
-<summary>Code</summary>
-<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>pacman<span class="sc">::</span><span class="fu">p_load</span>(tidyverse, DescTools, skimr, ggrepel, DT, kableExtra, ggplot2, scales, ggthemes, visNetwork, ggraph, igraph, gganimate, tidygraph, ggrain, patchwork, ggpubr, htmlwidgets)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>pacman<span class="sc">::</span><span class="fu">p_load</span>(tidyverse, ggrepel, DT, kableExtra, ggplot2, scales, ggthemes, visNetwork, ggraph, igraph, gganimate, tidygraph, ggrain, patchwork, ggpubr, htmlwidgets)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 <section id="loading-the-data" class="level2" data-number="2.2">
@@ -237,14 +246,14 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </div>
 </section>
 </section>
-<section id="companies-by-industry" class="level1" data-number="3">
-<h1 data-number="3"><span class="header-section-number">3</span> Companies by Industry</h1>
+<section id="network-structures-by-industry" class="level1" data-number="3">
+<h1 data-number="3"><span class="header-section-number">3</span> Network Structures By Industry</h1>
 <p>The following groups were derived from topic modeling of products and services offered by companies in the data:</p>
 <table class="table">
 <colgroup>
-<col style="width: 23%">
-<col style="width: 23%">
-<col style="width: 53%">
+<col style="width: 24%">
+<col style="width: 24%">
+<col style="width: 50%">
 </colgroup>
 <thead>
 <tr class="header">
@@ -495,8 +504,628 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a><span class="co"># industrial companies</span></span>
 <span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>industrial_graph <span class="ot">&lt;-</span> <span class="fu">tbl_graph</span>(<span class="at">nodes =</span> nodes_industrial_new,</span>
-<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>                            <span class="at">edges =</span> links_industrial, </span>
-<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>                            <span class="at">directed =</span> <span class="cn">FALSE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>                              <span class="at">edges =</span> links_industrial, </span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>                              <span class="at">directed =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a><span class="co"># food companies</span></span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>food_graph <span class="ot">&lt;-</span> <span class="fu">tbl_graph</span>(<span class="at">nodes =</span> nodes_food_new,</span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>                        <span class="at">edges =</span> links_food, </span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a>                        <span class="at">directed =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a><span class="co"># Seafood-processing companies</span></span>
+<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a>seafood_graph <span class="ot">&lt;-</span> <span class="fu">tbl_graph</span>(<span class="at">nodes =</span> nodes_seafood_new,</span>
+<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a>                          <span class="at">edges =</span> links_seafood, </span>
+<span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a>                          <span class="at">directed =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb7-20"><a href="#cb7-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-21"><a href="#cb7-21" aria-hidden="true" tabindex="-1"></a><span class="co"># Consumer-goods companies</span></span>
+<span id="cb7-22"><a href="#cb7-22" aria-hidden="true" tabindex="-1"></a>goods_graph <span class="ot">&lt;-</span> <span class="fu">tbl_graph</span>(<span class="at">nodes =</span> nodes_goods_new,</span>
+<span id="cb7-23"><a href="#cb7-23" aria-hidden="true" tabindex="-1"></a>                        <span class="at">edges =</span> links_goods, </span>
+<span id="cb7-24"><a href="#cb7-24" aria-hidden="true" tabindex="-1"></a>                        <span class="at">directed =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb7-25"><a href="#cb7-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-26"><a href="#cb7-26" aria-hidden="true" tabindex="-1"></a><span class="co"># Transport Logistics companies</span></span>
+<span id="cb7-27"><a href="#cb7-27" aria-hidden="true" tabindex="-1"></a>transport_graph <span class="ot">&lt;-</span> <span class="fu">tbl_graph</span>(<span class="at">nodes =</span> nodes_transport_new,</span>
+<span id="cb7-28"><a href="#cb7-28" aria-hidden="true" tabindex="-1"></a>                            <span class="at">edges =</span> links_transport, </span>
+<span id="cb7-29"><a href="#cb7-29" aria-hidden="true" tabindex="-1"></a>                            <span class="at">directed =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb7-30"><a href="#cb7-30" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-31"><a href="#cb7-31" aria-hidden="true" tabindex="-1"></a><span class="co"># fishing-related companies</span></span>
+<span id="cb7-32"><a href="#cb7-32" aria-hidden="true" tabindex="-1"></a>fishing_graph <span class="ot">&lt;-</span> <span class="fu">tbl_graph</span>(<span class="at">nodes =</span> nodes_fishing_new,</span>
+<span id="cb7-33"><a href="#cb7-33" aria-hidden="true" tabindex="-1"></a>                          <span class="at">edges =</span> links_fishing, </span>
+<span id="cb7-34"><a href="#cb7-34" aria-hidden="true" tabindex="-1"></a>                          <span class="at">directed =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb7-35"><a href="#cb7-35" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-36"><a href="#cb7-36" aria-hidden="true" tabindex="-1"></a><span class="co"># multi-industry companies</span></span>
+<span id="cb7-37"><a href="#cb7-37" aria-hidden="true" tabindex="-1"></a>multi_graph <span class="ot">&lt;-</span> <span class="fu">tbl_graph</span>(<span class="at">nodes =</span> nodes_multi_new,</span>
+<span id="cb7-38"><a href="#cb7-38" aria-hidden="true" tabindex="-1"></a>                          <span class="at">edges =</span> links_multi, </span>
+<span id="cb7-39"><a href="#cb7-39" aria-hidden="true" tabindex="-1"></a>                          <span class="at">directed =</span> <span class="cn">FALSE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="panel-tabset">
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-2-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-1" role="tab" aria-controls="tabset-2-1" aria-selected="true"><strong>Industrial Companies</strong></a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-2-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-2" role="tab" aria-controls="tabset-2-2" aria-selected="false"><strong>Food Companies</strong></a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-2-3-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-3" role="tab" aria-controls="tabset-2-3" aria-selected="false"><strong>Seafood Processing Companies</strong></a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-2-4-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-4" role="tab" aria-controls="tabset-2-4" aria-selected="false"><strong>Consumer Goods Companies</strong></a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-2-5-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-5" role="tab" aria-controls="tabset-2-5" aria-selected="false"><strong>Transport &amp; Logistics Companies</strong></a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-2-6-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-6" role="tab" aria-controls="tabset-2-6" aria-selected="false"><strong>Fishing-related Companies</strong></a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-2-7-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-7" role="tab" aria-controls="tabset-2-7" aria-selected="false"><strong>Multi-industry Companies</strong></a></li></ul>
+<div class="tab-content">
+<div id="tabset-2-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-2-1-tab">
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Measure degree centrality and save as a column</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="fu">V</span>(industrial_graph)<span class="sc">$</span>degree <span class="ot">&lt;-</span> <span class="fu">degree</span>(industrial_graph, <span class="at">mode =</span> <span class="st">"all"</span>)</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Define custom colors for each group</span></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>group_colors <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"Ultimate Beneficial Owner"</span> <span class="ot">=</span> <span class="st">"#D86171"</span> , </span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>                  <span class="st">"Shareholder"</span> <span class="ot">=</span> <span class="st">"#163759"</span>, </span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>                  <span class="st">"Company Contact"</span> <span class="ot">=</span> <span class="st">"#F39C12"</span> , </span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>                  <span class="st">"Multi-role Entity"</span> <span class="ot">=</span> <span class="st">"#48C9B0"</span>, </span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>                  <span class="st">"Industrial Company"</span> <span class="ot">=</span> <span class="st">"#2980B9"</span>)</span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">1234</span>)</span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>industrial_network <span class="ot">&lt;-</span> industrial_graph <span class="sc">%&gt;%</span></span>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggraph</span>(<span class="at">layout =</span> <span class="st">"nicely"</span>) <span class="sc">+</span></span>
+<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_edge_fan</span>(</span>
+<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a>    <span class="at">alpha =</span> .<span class="dv">6</span>,</span>
+<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a>    <span class="at">show.legend =</span> <span class="cn">FALSE</span></span>
+<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_edge_width</span>(</span>
+<span id="cb8-19"><a href="#cb8-19" aria-hidden="true" tabindex="-1"></a>    <span class="at">range =</span> <span class="fu">c</span>(<span class="fl">0.1</span>,<span class="dv">4</span>)</span>
+<span id="cb8-20"><a href="#cb8-20" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb8-21"><a href="#cb8-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_node_point</span>(</span>
+<span id="cb8-22"><a href="#cb8-22" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Ensure that UBO and Multi-role entity nodes can be clearly seen by making node size larger</span></span>
+<span id="cb8-23"><a href="#cb8-23" aria-hidden="true" tabindex="-1"></a>    <span class="fu">aes</span>(<span class="at">size =</span> <span class="fu">ifelse</span>(group <span class="sc">==</span> <span class="st">"Ultimate Beneficial Owner"</span> <span class="sc">|</span> group <span class="sc">==</span> <span class="st">"Multi-role Entity"</span>, <span class="dv">3</span>, degree),</span>
+<span id="cb8-24"><a href="#cb8-24" aria-hidden="true" tabindex="-1"></a>        <span class="at">color =</span> group),</span>
+<span id="cb8-25"><a href="#cb8-25" aria-hidden="true" tabindex="-1"></a>    <span class="at">alpha =</span> .<span class="dv">9</span></span>
+<span id="cb8-26"><a href="#cb8-26" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb8-27"><a href="#cb8-27" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Remove the legend for "degree"</span></span>
+<span id="cb8-28"><a href="#cb8-28" aria-hidden="true" tabindex="-1"></a>  <span class="fu">guides</span>(<span class="at">color =</span> <span class="fu">guide_legend</span>(<span class="at">title =</span> <span class="st">"Role:"</span>),</span>
+<span id="cb8-29"><a href="#cb8-29" aria-hidden="true" tabindex="-1"></a>         <span class="at">size =</span> <span class="st">"none"</span></span>
+<span id="cb8-30"><a href="#cb8-30" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span> </span>
+<span id="cb8-31"><a href="#cb8-31" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Assign custom colors to each group to standardise</span></span>
+<span id="cb8-32"><a href="#cb8-32" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_manual</span>(<span class="at">values =</span> group_colors) <span class="sc">+</span> </span>
+<span id="cb8-33"><a href="#cb8-33" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Only label companies in top 25th percentile of degree measure</span></span>
+<span id="cb8-34"><a href="#cb8-34" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_node_text</span>(</span>
+<span id="cb8-35"><a href="#cb8-35" aria-hidden="true" tabindex="-1"></a>    <span class="fu">aes</span>(<span class="at">label =</span> <span class="fu">ifelse</span>(degree <span class="sc">&gt;</span> <span class="fu">quantile</span>(degree, .<span class="dv">75</span>), id, <span class="st">""</span>)), </span>
+<span id="cb8-36"><a href="#cb8-36" aria-hidden="true" tabindex="-1"></a>    <span class="at">size =</span> <span class="dv">2</span>,</span>
+<span id="cb8-37"><a href="#cb8-37" aria-hidden="true" tabindex="-1"></a>    <span class="at">repel =</span> <span class="cn">TRUE</span></span>
+<span id="cb8-38"><a href="#cb8-38" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb8-39"><a href="#cb8-39" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb8-40"><a href="#cb8-40" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Industrial Company Network"</span></span>
+<span id="cb8-41"><a href="#cb8-41" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb8-42"><a href="#cb8-42" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(</span>
+<span id="cb8-43"><a href="#cb8-43" aria-hidden="true" tabindex="-1"></a>    <span class="at">plot.title =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">16</span>,</span>
+<span id="cb8-44"><a href="#cb8-44" aria-hidden="true" tabindex="-1"></a>                              <span class="at">color =</span> <span class="st">"grey20"</span>),</span>
+<span id="cb8-45"><a href="#cb8-45" aria-hidden="true" tabindex="-1"></a>    <span class="at">legend.title =</span> <span class="fu">element_text</span>(),</span>
+<span id="cb8-46"><a href="#cb8-46" aria-hidden="true" tabindex="-1"></a>    <span class="at">legend.position =</span> <span class="st">"bottom"</span>,</span>
+<span id="cb8-47"><a href="#cb8-47" aria-hidden="true" tabindex="-1"></a>    <span class="co"># legend.direction = "horizontal",</span></span>
+<span id="cb8-48"><a href="#cb8-48" aria-hidden="true" tabindex="-1"></a>    <span class="at">legend.background =</span> <span class="fu">element_rect</span>(<span class="at">fill=</span><span class="st">"#dfdfeb"</span>,<span class="at">colour=</span><span class="st">"#dfdfeb"</span>),</span>
+<span id="cb8-49"><a href="#cb8-49" aria-hidden="true" tabindex="-1"></a>    <span class="at">panel.background =</span> <span class="fu">element_rect</span>(<span class="at">fill=</span><span class="st">"#dfdfeb"</span>,<span class="at">colour=</span><span class="st">"#dfdfeb"</span>),</span>
+<span id="cb8-50"><a href="#cb8-50" aria-hidden="true" tabindex="-1"></a>    <span class="at">plot.background =</span> <span class="fu">element_rect</span>(<span class="at">fill=</span><span class="st">"#dfdfeb"</span>,<span class="at">colour=</span><span class="st">"#dfdfeb"</span>),</span>
+<span id="cb8-51"><a href="#cb8-51" aria-hidden="true" tabindex="-1"></a>    <span class="at">plot.margin =</span> <span class="fu">margin</span>(<span class="at">r =</span> <span class="dv">10</span>,</span>
+<span id="cb8-52"><a href="#cb8-52" aria-hidden="true" tabindex="-1"></a>                         <span class="at">l =</span> <span class="dv">10</span>)</span>
+<span id="cb8-53"><a href="#cb8-53" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb8-54"><a href="#cb8-54" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-55"><a href="#cb8-55" aria-hidden="true" tabindex="-1"></a>industrial_network</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<p><img src="fishy_similarities_files/figure-html/unnamed-chunk-7-1.png" class="img-fluid" width="768"></p>
+</div>
+</div>
+</div>
+<div id="tabset-2-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-2-2-tab">
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Measure degree centrality and save as a column</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="fu">V</span>(food_graph)<span class="sc">$</span>degree <span class="ot">&lt;-</span> <span class="fu">degree</span>(food_graph, <span class="at">mode =</span> <span class="st">"all"</span>)</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Define custom colors for each group</span></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>group_colors <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"Ultimate Beneficial Owner"</span> <span class="ot">=</span> <span class="st">"#D86171"</span> , </span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>                  <span class="st">"Shareholder"</span> <span class="ot">=</span> <span class="st">"#163759"</span>, </span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>                  <span class="st">"Company Contact"</span> <span class="ot">=</span> <span class="st">"#F39C12"</span> , </span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>                  <span class="st">"Multi-role Entity"</span> <span class="ot">=</span> <span class="st">"#48C9B0"</span>, </span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>                  <span class="st">"Food Company"</span> <span class="ot">=</span> <span class="st">"grey40"</span>)</span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">1234</span>)</span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a>food_network <span class="ot">&lt;-</span> food_graph <span class="sc">%&gt;%</span></span>
+<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggraph</span>(<span class="at">layout =</span> <span class="st">"nicely"</span>) <span class="sc">+</span></span>
+<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_edge_fan</span>(</span>
+<span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a>    <span class="at">alpha =</span> .<span class="dv">6</span>,</span>
+<span id="cb9-16"><a href="#cb9-16" aria-hidden="true" tabindex="-1"></a>    <span class="at">show.legend =</span> <span class="cn">FALSE</span></span>
+<span id="cb9-17"><a href="#cb9-17" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb9-18"><a href="#cb9-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_edge_width</span>(</span>
+<span id="cb9-19"><a href="#cb9-19" aria-hidden="true" tabindex="-1"></a>    <span class="at">range =</span> <span class="fu">c</span>(<span class="fl">0.1</span>,<span class="dv">4</span>)</span>
+<span id="cb9-20"><a href="#cb9-20" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb9-21"><a href="#cb9-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_node_point</span>(</span>
+<span id="cb9-22"><a href="#cb9-22" aria-hidden="true" tabindex="-1"></a>    <span class="fu">aes</span>(<span class="at">size =</span> <span class="fu">ifelse</span>(group <span class="sc">==</span> <span class="st">"Ultimate Beneficial Owner"</span> <span class="sc">|</span> group <span class="sc">==</span> <span class="st">"Multi-role Entity"</span>, <span class="dv">3</span>, degree),</span>
+<span id="cb9-23"><a href="#cb9-23" aria-hidden="true" tabindex="-1"></a>        <span class="at">color =</span> group),</span>
+<span id="cb9-24"><a href="#cb9-24" aria-hidden="true" tabindex="-1"></a>    <span class="at">alpha =</span> .<span class="dv">9</span></span>
+<span id="cb9-25"><a href="#cb9-25" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb9-26"><a href="#cb9-26" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Remove the legend for "degree"</span></span>
+<span id="cb9-27"><a href="#cb9-27" aria-hidden="true" tabindex="-1"></a>  <span class="fu">guides</span>(<span class="at">color =</span> <span class="fu">guide_legend</span>(<span class="at">title =</span> <span class="st">"Role:"</span>),</span>
+<span id="cb9-28"><a href="#cb9-28" aria-hidden="true" tabindex="-1"></a>         <span class="at">size =</span> <span class="st">"none"</span></span>
+<span id="cb9-29"><a href="#cb9-29" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span> </span>
+<span id="cb9-30"><a href="#cb9-30" aria-hidden="true" tabindex="-1"></a>   <span class="co"># Assign custom colors to each group to standardise</span></span>
+<span id="cb9-31"><a href="#cb9-31" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_manual</span>(<span class="at">values =</span> group_colors) <span class="sc">+</span> </span>
+<span id="cb9-32"><a href="#cb9-32" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_node_text</span>(</span>
+<span id="cb9-33"><a href="#cb9-33" aria-hidden="true" tabindex="-1"></a>    <span class="fu">aes</span>(<span class="at">label =</span> <span class="fu">ifelse</span>(degree <span class="sc">&gt;</span> <span class="fu">quantile</span>(degree, .<span class="dv">75</span>), id, <span class="st">""</span>)), </span>
+<span id="cb9-34"><a href="#cb9-34" aria-hidden="true" tabindex="-1"></a>    <span class="at">size =</span> <span class="dv">2</span>,</span>
+<span id="cb9-35"><a href="#cb9-35" aria-hidden="true" tabindex="-1"></a>    <span class="at">repel =</span> <span class="cn">TRUE</span></span>
+<span id="cb9-36"><a href="#cb9-36" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb9-37"><a href="#cb9-37" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb9-38"><a href="#cb9-38" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Food Industry Network"</span></span>
+<span id="cb9-39"><a href="#cb9-39" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb9-40"><a href="#cb9-40" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(</span>
+<span id="cb9-41"><a href="#cb9-41" aria-hidden="true" tabindex="-1"></a>    <span class="at">plot.title =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">16</span>,</span>
+<span id="cb9-42"><a href="#cb9-42" aria-hidden="true" tabindex="-1"></a>                              <span class="at">color =</span> <span class="st">"grey20"</span>),</span>
+<span id="cb9-43"><a href="#cb9-43" aria-hidden="true" tabindex="-1"></a>    <span class="at">legend.title =</span> <span class="fu">element_text</span>(),</span>
+<span id="cb9-44"><a href="#cb9-44" aria-hidden="true" tabindex="-1"></a>    <span class="at">legend.position =</span> <span class="st">"bottom"</span>,</span>
+<span id="cb9-45"><a href="#cb9-45" aria-hidden="true" tabindex="-1"></a>    <span class="co"># legend.direction = "horizontal",</span></span>
+<span id="cb9-46"><a href="#cb9-46" aria-hidden="true" tabindex="-1"></a>    <span class="at">legend.background =</span> <span class="fu">element_rect</span>(<span class="at">fill=</span><span class="st">"#dfdfeb"</span>,<span class="at">colour=</span><span class="st">"#dfdfeb"</span>),</span>
+<span id="cb9-47"><a href="#cb9-47" aria-hidden="true" tabindex="-1"></a>    <span class="at">panel.background =</span> <span class="fu">element_rect</span>(<span class="at">fill=</span><span class="st">"#dfdfeb"</span>,<span class="at">colour=</span><span class="st">"#dfdfeb"</span>),</span>
+<span id="cb9-48"><a href="#cb9-48" aria-hidden="true" tabindex="-1"></a>    <span class="at">plot.background =</span> <span class="fu">element_rect</span>(<span class="at">fill=</span><span class="st">"#dfdfeb"</span>,<span class="at">colour=</span><span class="st">"#dfdfeb"</span>),</span>
+<span id="cb9-49"><a href="#cb9-49" aria-hidden="true" tabindex="-1"></a>    <span class="at">plot.margin =</span> <span class="fu">margin</span>(<span class="at">r =</span> <span class="dv">10</span>,</span>
+<span id="cb9-50"><a href="#cb9-50" aria-hidden="true" tabindex="-1"></a>                         <span class="at">l =</span> <span class="dv">10</span>)</span>
+<span id="cb9-51"><a href="#cb9-51" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb9-52"><a href="#cb9-52" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-53"><a href="#cb9-53" aria-hidden="true" tabindex="-1"></a>food_network</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<p><img src="fishy_similarities_files/figure-html/unnamed-chunk-8-1.png" class="img-fluid" width="768"></p>
+</div>
+</div>
+</div>
+<div id="tabset-2-3" class="tab-pane" role="tabpanel" aria-labelledby="tabset-2-3-tab">
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Measure degree centrality and save as a column</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="fu">V</span>(seafood_graph)<span class="sc">$</span>degree <span class="ot">&lt;-</span> <span class="fu">degree</span>(seafood_graph, <span class="at">mode =</span> <span class="st">"all"</span>)</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Define custom colors for each group</span></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>group_colors <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"Ultimate Beneficial Owner"</span> <span class="ot">=</span> <span class="st">"#D86171"</span> , </span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>                  <span class="st">"Shareholder"</span> <span class="ot">=</span> <span class="st">"#163759"</span>, </span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>                  <span class="st">"Company Contact"</span> <span class="ot">=</span> <span class="st">"#F39C12"</span> , </span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>                  <span class="st">"Multi-role Entity"</span> <span class="ot">=</span> <span class="st">"#48C9B0"</span>, </span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>                  <span class="st">"Seafood-processing Company"</span> <span class="ot">=</span> <span class="st">"#B78EA4"</span>)</span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">1234</span>)</span>
+<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a>seafood_network <span class="ot">&lt;-</span> seafood_graph <span class="sc">%&gt;%</span></span>
+<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggraph</span>(<span class="at">layout =</span> <span class="st">"nicely"</span>) <span class="sc">+</span></span>
+<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_edge_fan</span>(</span>
+<span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a>    <span class="at">alpha =</span> .<span class="dv">6</span>,</span>
+<span id="cb10-16"><a href="#cb10-16" aria-hidden="true" tabindex="-1"></a>    <span class="at">show.legend =</span> <span class="cn">FALSE</span></span>
+<span id="cb10-17"><a href="#cb10-17" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb10-18"><a href="#cb10-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_edge_width</span>(</span>
+<span id="cb10-19"><a href="#cb10-19" aria-hidden="true" tabindex="-1"></a>    <span class="at">range =</span> <span class="fu">c</span>(<span class="fl">0.1</span>,<span class="dv">4</span>)</span>
+<span id="cb10-20"><a href="#cb10-20" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb10-21"><a href="#cb10-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_node_point</span>(</span>
+<span id="cb10-22"><a href="#cb10-22" aria-hidden="true" tabindex="-1"></a>    <span class="fu">aes</span>(<span class="at">size =</span> <span class="fu">ifelse</span>(group <span class="sc">==</span> <span class="st">"Ultimate Beneficial Owner"</span> <span class="sc">|</span> group <span class="sc">==</span> <span class="st">"Multi-role Entity"</span>, <span class="dv">3</span>, degree),</span>
+<span id="cb10-23"><a href="#cb10-23" aria-hidden="true" tabindex="-1"></a>        <span class="at">color =</span> group),</span>
+<span id="cb10-24"><a href="#cb10-24" aria-hidden="true" tabindex="-1"></a>    <span class="at">alpha =</span> .<span class="dv">9</span></span>
+<span id="cb10-25"><a href="#cb10-25" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb10-26"><a href="#cb10-26" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Remove the legend for "degree"</span></span>
+<span id="cb10-27"><a href="#cb10-27" aria-hidden="true" tabindex="-1"></a>  <span class="fu">guides</span>(<span class="at">color =</span> <span class="fu">guide_legend</span>(<span class="at">title =</span> <span class="st">"Role:"</span>),</span>
+<span id="cb10-28"><a href="#cb10-28" aria-hidden="true" tabindex="-1"></a>         <span class="at">size =</span> <span class="st">"none"</span></span>
+<span id="cb10-29"><a href="#cb10-29" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span> </span>
+<span id="cb10-30"><a href="#cb10-30" aria-hidden="true" tabindex="-1"></a>   <span class="co"># Assign custom colors to each group to standardise</span></span>
+<span id="cb10-31"><a href="#cb10-31" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_manual</span>(<span class="at">values =</span> group_colors) <span class="sc">+</span> </span>
+<span id="cb10-32"><a href="#cb10-32" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_node_text</span>(</span>
+<span id="cb10-33"><a href="#cb10-33" aria-hidden="true" tabindex="-1"></a>    <span class="fu">aes</span>(<span class="at">label =</span> <span class="fu">ifelse</span>(degree <span class="sc">&gt;</span> <span class="fu">quantile</span>(degree, .<span class="dv">75</span>), id, <span class="st">""</span>)), </span>
+<span id="cb10-34"><a href="#cb10-34" aria-hidden="true" tabindex="-1"></a>    <span class="at">size =</span> <span class="dv">2</span>,</span>
+<span id="cb10-35"><a href="#cb10-35" aria-hidden="true" tabindex="-1"></a>    <span class="at">repel =</span> <span class="cn">TRUE</span></span>
+<span id="cb10-36"><a href="#cb10-36" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb10-37"><a href="#cb10-37" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb10-38"><a href="#cb10-38" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Seafood-Processing Industry Network"</span></span>
+<span id="cb10-39"><a href="#cb10-39" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb10-40"><a href="#cb10-40" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(</span>
+<span id="cb10-41"><a href="#cb10-41" aria-hidden="true" tabindex="-1"></a>    <span class="at">plot.title =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">16</span>,</span>
+<span id="cb10-42"><a href="#cb10-42" aria-hidden="true" tabindex="-1"></a>                              <span class="at">color =</span> <span class="st">"grey20"</span>),</span>
+<span id="cb10-43"><a href="#cb10-43" aria-hidden="true" tabindex="-1"></a>    <span class="at">legend.title =</span> <span class="fu">element_text</span>(),</span>
+<span id="cb10-44"><a href="#cb10-44" aria-hidden="true" tabindex="-1"></a>    <span class="at">legend.position =</span> <span class="st">"bottom"</span>,</span>
+<span id="cb10-45"><a href="#cb10-45" aria-hidden="true" tabindex="-1"></a>    <span class="co"># legend.direction = "horizontal",</span></span>
+<span id="cb10-46"><a href="#cb10-46" aria-hidden="true" tabindex="-1"></a>    <span class="at">legend.background =</span> <span class="fu">element_rect</span>(<span class="at">fill=</span><span class="st">"#dfdfeb"</span>,<span class="at">colour=</span><span class="st">"#dfdfeb"</span>),</span>
+<span id="cb10-47"><a href="#cb10-47" aria-hidden="true" tabindex="-1"></a>    <span class="at">panel.background =</span> <span class="fu">element_rect</span>(<span class="at">fill=</span><span class="st">"#dfdfeb"</span>,<span class="at">colour=</span><span class="st">"#dfdfeb"</span>),</span>
+<span id="cb10-48"><a href="#cb10-48" aria-hidden="true" tabindex="-1"></a>    <span class="at">plot.background =</span> <span class="fu">element_rect</span>(<span class="at">fill=</span><span class="st">"#dfdfeb"</span>,<span class="at">colour=</span><span class="st">"#dfdfeb"</span>),</span>
+<span id="cb10-49"><a href="#cb10-49" aria-hidden="true" tabindex="-1"></a>    <span class="at">plot.margin =</span> <span class="fu">margin</span>(<span class="at">r =</span> <span class="dv">10</span>,</span>
+<span id="cb10-50"><a href="#cb10-50" aria-hidden="true" tabindex="-1"></a>                         <span class="at">l =</span> <span class="dv">10</span>)</span>
+<span id="cb10-51"><a href="#cb10-51" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb10-52"><a href="#cb10-52" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-53"><a href="#cb10-53" aria-hidden="true" tabindex="-1"></a>seafood_network</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<p><img src="fishy_similarities_files/figure-html/unnamed-chunk-9-1.png" class="img-fluid" width="768"></p>
+</div>
+</div>
+</div>
+<div id="tabset-2-4" class="tab-pane" role="tabpanel" aria-labelledby="tabset-2-4-tab">
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Measure degree centrality and save as a column</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="fu">V</span>(goods_graph)<span class="sc">$</span>degree <span class="ot">&lt;-</span> <span class="fu">degree</span>(goods_graph, <span class="at">mode =</span> <span class="st">"all"</span>)</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Define custom colors for each group</span></span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>group_colors <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"Ultimate Beneficial Owner"</span> <span class="ot">=</span> <span class="st">"#D86171"</span> , </span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>                  <span class="st">"Shareholder"</span> <span class="ot">=</span> <span class="st">"#163759"</span>, </span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>                  <span class="st">"Company Contact"</span> <span class="ot">=</span> <span class="st">"#F39C12"</span> , </span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>                  <span class="st">"Multi-role Entity"</span> <span class="ot">=</span> <span class="st">"#48C9B0"</span>, </span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>                  <span class="st">"Consumer-goods Company"</span> <span class="ot">=</span> <span class="st">"#138D75"</span>)</span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">1234</span>)</span>
+<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a>goods_network <span class="ot">&lt;-</span> goods_graph <span class="sc">%&gt;%</span></span>
+<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggraph</span>(<span class="at">layout =</span> <span class="st">"nicely"</span>) <span class="sc">+</span></span>
+<span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_edge_fan</span>(</span>
+<span id="cb11-15"><a href="#cb11-15" aria-hidden="true" tabindex="-1"></a>    <span class="at">alpha =</span> .<span class="dv">6</span>,</span>
+<span id="cb11-16"><a href="#cb11-16" aria-hidden="true" tabindex="-1"></a>    <span class="at">show.legend =</span> <span class="cn">FALSE</span></span>
+<span id="cb11-17"><a href="#cb11-17" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb11-18"><a href="#cb11-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_edge_width</span>(</span>
+<span id="cb11-19"><a href="#cb11-19" aria-hidden="true" tabindex="-1"></a>    <span class="at">range =</span> <span class="fu">c</span>(<span class="fl">0.1</span>,<span class="dv">4</span>)</span>
+<span id="cb11-20"><a href="#cb11-20" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb11-21"><a href="#cb11-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_node_point</span>(</span>
+<span id="cb11-22"><a href="#cb11-22" aria-hidden="true" tabindex="-1"></a>    <span class="fu">aes</span>(<span class="at">size =</span> <span class="fu">ifelse</span>(group <span class="sc">==</span> <span class="st">"Ultimate Beneficial Owner"</span> <span class="sc">|</span> group <span class="sc">==</span> <span class="st">"Multi-role Entity"</span>, <span class="dv">3</span>, degree),</span>
+<span id="cb11-23"><a href="#cb11-23" aria-hidden="true" tabindex="-1"></a>        <span class="at">color =</span> group),</span>
+<span id="cb11-24"><a href="#cb11-24" aria-hidden="true" tabindex="-1"></a>    <span class="at">alpha =</span> .<span class="dv">9</span></span>
+<span id="cb11-25"><a href="#cb11-25" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb11-26"><a href="#cb11-26" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Remove the legend for "degree"</span></span>
+<span id="cb11-27"><a href="#cb11-27" aria-hidden="true" tabindex="-1"></a>  <span class="fu">guides</span>(<span class="at">color =</span> <span class="fu">guide_legend</span>(<span class="at">title =</span> <span class="st">"Role:"</span>),</span>
+<span id="cb11-28"><a href="#cb11-28" aria-hidden="true" tabindex="-1"></a>         <span class="at">size =</span> <span class="st">"none"</span></span>
+<span id="cb11-29"><a href="#cb11-29" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span> </span>
+<span id="cb11-30"><a href="#cb11-30" aria-hidden="true" tabindex="-1"></a>   <span class="co"># Assign custom colors to each group to standardise</span></span>
+<span id="cb11-31"><a href="#cb11-31" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_manual</span>(<span class="at">values =</span> group_colors) <span class="sc">+</span> </span>
+<span id="cb11-32"><a href="#cb11-32" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_node_text</span>(</span>
+<span id="cb11-33"><a href="#cb11-33" aria-hidden="true" tabindex="-1"></a>    <span class="fu">aes</span>(<span class="at">label =</span> <span class="fu">ifelse</span>(degree <span class="sc">&gt;</span> <span class="fu">quantile</span>(degree, .<span class="dv">75</span>), id, <span class="st">""</span>)), </span>
+<span id="cb11-34"><a href="#cb11-34" aria-hidden="true" tabindex="-1"></a>    <span class="at">size =</span> <span class="dv">2</span>,</span>
+<span id="cb11-35"><a href="#cb11-35" aria-hidden="true" tabindex="-1"></a>    <span class="at">repel =</span> <span class="cn">TRUE</span></span>
+<span id="cb11-36"><a href="#cb11-36" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb11-37"><a href="#cb11-37" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb11-38"><a href="#cb11-38" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Consumer Goods Industry Network"</span></span>
+<span id="cb11-39"><a href="#cb11-39" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb11-40"><a href="#cb11-40" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(</span>
+<span id="cb11-41"><a href="#cb11-41" aria-hidden="true" tabindex="-1"></a>    <span class="at">plot.title =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">16</span>,</span>
+<span id="cb11-42"><a href="#cb11-42" aria-hidden="true" tabindex="-1"></a>                              <span class="at">color =</span> <span class="st">"grey20"</span>),</span>
+<span id="cb11-43"><a href="#cb11-43" aria-hidden="true" tabindex="-1"></a>    <span class="at">legend.title =</span> <span class="fu">element_text</span>(),</span>
+<span id="cb11-44"><a href="#cb11-44" aria-hidden="true" tabindex="-1"></a>    <span class="at">legend.position =</span> <span class="st">"bottom"</span>,</span>
+<span id="cb11-45"><a href="#cb11-45" aria-hidden="true" tabindex="-1"></a>    <span class="co"># legend.direction = "horizontal",</span></span>
+<span id="cb11-46"><a href="#cb11-46" aria-hidden="true" tabindex="-1"></a>    <span class="at">legend.background =</span> <span class="fu">element_rect</span>(<span class="at">fill=</span><span class="st">"#dfdfeb"</span>,<span class="at">colour=</span><span class="st">"#dfdfeb"</span>),</span>
+<span id="cb11-47"><a href="#cb11-47" aria-hidden="true" tabindex="-1"></a>    <span class="at">panel.background =</span> <span class="fu">element_rect</span>(<span class="at">fill=</span><span class="st">"#dfdfeb"</span>,<span class="at">colour=</span><span class="st">"#dfdfeb"</span>),</span>
+<span id="cb11-48"><a href="#cb11-48" aria-hidden="true" tabindex="-1"></a>    <span class="at">plot.background =</span> <span class="fu">element_rect</span>(<span class="at">fill=</span><span class="st">"#dfdfeb"</span>,<span class="at">colour=</span><span class="st">"#dfdfeb"</span>),</span>
+<span id="cb11-49"><a href="#cb11-49" aria-hidden="true" tabindex="-1"></a>    <span class="at">plot.margin =</span> <span class="fu">margin</span>(<span class="at">r =</span> <span class="dv">10</span>,</span>
+<span id="cb11-50"><a href="#cb11-50" aria-hidden="true" tabindex="-1"></a>                         <span class="at">l =</span> <span class="dv">10</span>)</span>
+<span id="cb11-51"><a href="#cb11-51" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb11-52"><a href="#cb11-52" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-53"><a href="#cb11-53" aria-hidden="true" tabindex="-1"></a>goods_network</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<p><img src="fishy_similarities_files/figure-html/unnamed-chunk-10-1.png" class="img-fluid" width="768"></p>
+</div>
+</div>
+</div>
+<div id="tabset-2-5" class="tab-pane" role="tabpanel" aria-labelledby="tabset-2-5-tab">
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Measure degree centrality and save as a column</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="fu">V</span>(transport_graph)<span class="sc">$</span>degree <span class="ot">&lt;-</span> <span class="fu">degree</span>(transport_graph, <span class="at">mode =</span> <span class="st">"all"</span>)</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Define custom colors for each group</span></span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>group_colors <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"Ultimate Beneficial Owner"</span> <span class="ot">=</span> <span class="st">"#D86171"</span> , </span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>                  <span class="st">"Shareholder"</span> <span class="ot">=</span> <span class="st">"#163759"</span>, </span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>                  <span class="st">"Company Contact"</span> <span class="ot">=</span> <span class="st">"#F39C12"</span> , </span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a>                  <span class="st">"Multi-role Entity"</span> <span class="ot">=</span> <span class="st">"#48C9B0"</span>, </span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a>                  <span class="st">"Transport-logistics Company"</span> <span class="ot">=</span> <span class="st">"#85929E"</span>)</span>
+<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">1234</span>)</span>
+<span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a>transport_network <span class="ot">&lt;-</span> transport_graph <span class="sc">%&gt;%</span></span>
+<span id="cb12-13"><a href="#cb12-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggraph</span>(<span class="at">layout =</span> <span class="st">"nicely"</span>) <span class="sc">+</span></span>
+<span id="cb12-14"><a href="#cb12-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_edge_fan</span>(</span>
+<span id="cb12-15"><a href="#cb12-15" aria-hidden="true" tabindex="-1"></a>    <span class="at">alpha =</span> .<span class="dv">6</span>,</span>
+<span id="cb12-16"><a href="#cb12-16" aria-hidden="true" tabindex="-1"></a>    <span class="at">show.legend =</span> <span class="cn">FALSE</span></span>
+<span id="cb12-17"><a href="#cb12-17" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb12-18"><a href="#cb12-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_edge_width</span>(</span>
+<span id="cb12-19"><a href="#cb12-19" aria-hidden="true" tabindex="-1"></a>    <span class="at">range =</span> <span class="fu">c</span>(<span class="fl">0.1</span>,<span class="dv">4</span>)</span>
+<span id="cb12-20"><a href="#cb12-20" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb12-21"><a href="#cb12-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_node_point</span>(</span>
+<span id="cb12-22"><a href="#cb12-22" aria-hidden="true" tabindex="-1"></a>    <span class="fu">aes</span>(<span class="at">size =</span> <span class="fu">ifelse</span>(group <span class="sc">==</span> <span class="st">"Ultimate Beneficial Owner"</span> <span class="sc">|</span> group <span class="sc">==</span> <span class="st">"Multi-role Entity"</span>, <span class="dv">3</span>, degree),</span>
+<span id="cb12-23"><a href="#cb12-23" aria-hidden="true" tabindex="-1"></a>        <span class="at">color =</span> group),</span>
+<span id="cb12-24"><a href="#cb12-24" aria-hidden="true" tabindex="-1"></a>    <span class="at">alpha =</span> .<span class="dv">9</span></span>
+<span id="cb12-25"><a href="#cb12-25" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb12-26"><a href="#cb12-26" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Remove the legend for "degree"</span></span>
+<span id="cb12-27"><a href="#cb12-27" aria-hidden="true" tabindex="-1"></a>  <span class="fu">guides</span>(<span class="at">color =</span> <span class="fu">guide_legend</span>(<span class="at">title =</span> <span class="st">"Role:"</span>),</span>
+<span id="cb12-28"><a href="#cb12-28" aria-hidden="true" tabindex="-1"></a>         <span class="at">size =</span> <span class="st">"none"</span></span>
+<span id="cb12-29"><a href="#cb12-29" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span> </span>
+<span id="cb12-30"><a href="#cb12-30" aria-hidden="true" tabindex="-1"></a>   <span class="co"># Assign custom colors to each group to standardise</span></span>
+<span id="cb12-31"><a href="#cb12-31" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_manual</span>(<span class="at">values =</span> group_colors) <span class="sc">+</span> </span>
+<span id="cb12-32"><a href="#cb12-32" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_node_text</span>(</span>
+<span id="cb12-33"><a href="#cb12-33" aria-hidden="true" tabindex="-1"></a>    <span class="fu">aes</span>(<span class="at">label =</span> <span class="fu">ifelse</span>(degree <span class="sc">&gt;</span> <span class="fu">quantile</span>(degree, .<span class="dv">75</span>), id, <span class="st">""</span>)), </span>
+<span id="cb12-34"><a href="#cb12-34" aria-hidden="true" tabindex="-1"></a>    <span class="at">size =</span> <span class="dv">2</span>,</span>
+<span id="cb12-35"><a href="#cb12-35" aria-hidden="true" tabindex="-1"></a>    <span class="at">repel =</span> <span class="cn">TRUE</span></span>
+<span id="cb12-36"><a href="#cb12-36" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb12-37"><a href="#cb12-37" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb12-38"><a href="#cb12-38" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Transport and Logistics Industry Network"</span></span>
+<span id="cb12-39"><a href="#cb12-39" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb12-40"><a href="#cb12-40" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(</span>
+<span id="cb12-41"><a href="#cb12-41" aria-hidden="true" tabindex="-1"></a>    <span class="at">plot.title =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">16</span>,</span>
+<span id="cb12-42"><a href="#cb12-42" aria-hidden="true" tabindex="-1"></a>                              <span class="at">color =</span> <span class="st">"grey20"</span>),</span>
+<span id="cb12-43"><a href="#cb12-43" aria-hidden="true" tabindex="-1"></a>    <span class="at">legend.title =</span> <span class="fu">element_text</span>(),</span>
+<span id="cb12-44"><a href="#cb12-44" aria-hidden="true" tabindex="-1"></a>    <span class="at">legend.position =</span> <span class="st">"bottom"</span>,</span>
+<span id="cb12-45"><a href="#cb12-45" aria-hidden="true" tabindex="-1"></a>    <span class="co"># legend.direction = "horizontal",</span></span>
+<span id="cb12-46"><a href="#cb12-46" aria-hidden="true" tabindex="-1"></a>    <span class="at">legend.background =</span> <span class="fu">element_rect</span>(<span class="at">fill=</span><span class="st">"#dfdfeb"</span>,<span class="at">colour=</span><span class="st">"#dfdfeb"</span>),</span>
+<span id="cb12-47"><a href="#cb12-47" aria-hidden="true" tabindex="-1"></a>    <span class="at">panel.background =</span> <span class="fu">element_rect</span>(<span class="at">fill=</span><span class="st">"#dfdfeb"</span>,<span class="at">colour=</span><span class="st">"#dfdfeb"</span>),</span>
+<span id="cb12-48"><a href="#cb12-48" aria-hidden="true" tabindex="-1"></a>    <span class="at">plot.background =</span> <span class="fu">element_rect</span>(<span class="at">fill=</span><span class="st">"#dfdfeb"</span>,<span class="at">colour=</span><span class="st">"#dfdfeb"</span>),</span>
+<span id="cb12-49"><a href="#cb12-49" aria-hidden="true" tabindex="-1"></a>    <span class="at">plot.margin =</span> <span class="fu">margin</span>(<span class="at">r =</span> <span class="dv">10</span>,</span>
+<span id="cb12-50"><a href="#cb12-50" aria-hidden="true" tabindex="-1"></a>                         <span class="at">l =</span> <span class="dv">10</span>)</span>
+<span id="cb12-51"><a href="#cb12-51" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb12-52"><a href="#cb12-52" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-53"><a href="#cb12-53" aria-hidden="true" tabindex="-1"></a>transport_network</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<p><img src="fishy_similarities_files/figure-html/unnamed-chunk-11-1.png" class="img-fluid" width="768"></p>
+</div>
+</div>
+</div>
+<div id="tabset-2-6" class="tab-pane" role="tabpanel" aria-labelledby="tabset-2-6-tab">
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Measure degree centrality and save as a column</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="fu">V</span>(fishing_graph)<span class="sc">$</span>degree <span class="ot">&lt;-</span> <span class="fu">degree</span>(fishing_graph, <span class="at">mode =</span> <span class="st">"all"</span>)</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Define custom colors for each group</span></span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>group_colors <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"Ultimate Beneficial Owner"</span> <span class="ot">=</span> <span class="st">"#D86171"</span> , </span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>                  <span class="st">"Shareholder"</span> <span class="ot">=</span> <span class="st">"#163759"</span>, </span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>                  <span class="st">"Company Contact"</span> <span class="ot">=</span> <span class="st">"#F39C12"</span> , </span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>                  <span class="st">"Multi-role Entity"</span> <span class="ot">=</span> <span class="st">"#48C9B0"</span>,  </span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a>                  <span class="st">"Fishing-related Company"</span> <span class="ot">=</span> <span class="st">"#629DBB"</span>)</span>
+<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">1234</span>)</span>
+<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a>fishing_network <span class="ot">&lt;-</span> fishing_graph <span class="sc">%&gt;%</span></span>
+<span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggraph</span>(<span class="at">layout =</span> <span class="st">"nicely"</span>) <span class="sc">+</span></span>
+<span id="cb13-14"><a href="#cb13-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_edge_fan</span>(</span>
+<span id="cb13-15"><a href="#cb13-15" aria-hidden="true" tabindex="-1"></a>    <span class="at">alpha =</span> .<span class="dv">6</span>,</span>
+<span id="cb13-16"><a href="#cb13-16" aria-hidden="true" tabindex="-1"></a>    <span class="at">show.legend =</span> <span class="cn">FALSE</span></span>
+<span id="cb13-17"><a href="#cb13-17" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb13-18"><a href="#cb13-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_edge_width</span>(</span>
+<span id="cb13-19"><a href="#cb13-19" aria-hidden="true" tabindex="-1"></a>    <span class="at">range =</span> <span class="fu">c</span>(<span class="fl">0.1</span>,<span class="dv">4</span>)</span>
+<span id="cb13-20"><a href="#cb13-20" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb13-21"><a href="#cb13-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_node_point</span>(</span>
+<span id="cb13-22"><a href="#cb13-22" aria-hidden="true" tabindex="-1"></a>    <span class="fu">aes</span>(<span class="at">size =</span> <span class="fu">ifelse</span>(group <span class="sc">==</span> <span class="st">"Ultimate Beneficial Owner"</span> <span class="sc">|</span> group <span class="sc">==</span> <span class="st">"Multi-role Entity"</span>, <span class="dv">3</span>, degree),</span>
+<span id="cb13-23"><a href="#cb13-23" aria-hidden="true" tabindex="-1"></a>        <span class="at">color =</span> group),</span>
+<span id="cb13-24"><a href="#cb13-24" aria-hidden="true" tabindex="-1"></a>    <span class="at">alpha =</span> .<span class="dv">9</span></span>
+<span id="cb13-25"><a href="#cb13-25" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb13-26"><a href="#cb13-26" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Remove the legend for "degree"</span></span>
+<span id="cb13-27"><a href="#cb13-27" aria-hidden="true" tabindex="-1"></a>  <span class="fu">guides</span>(<span class="at">color =</span> <span class="fu">guide_legend</span>(<span class="at">title =</span> <span class="st">"Role:"</span>),</span>
+<span id="cb13-28"><a href="#cb13-28" aria-hidden="true" tabindex="-1"></a>         <span class="at">size =</span> <span class="st">"none"</span></span>
+<span id="cb13-29"><a href="#cb13-29" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span> </span>
+<span id="cb13-30"><a href="#cb13-30" aria-hidden="true" tabindex="-1"></a>   <span class="co"># Assign custom colors to each group to standardise</span></span>
+<span id="cb13-31"><a href="#cb13-31" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_manual</span>(<span class="at">values =</span> group_colors) <span class="sc">+</span> </span>
+<span id="cb13-32"><a href="#cb13-32" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_node_text</span>(</span>
+<span id="cb13-33"><a href="#cb13-33" aria-hidden="true" tabindex="-1"></a>    <span class="fu">aes</span>(<span class="at">label =</span> <span class="fu">ifelse</span>(degree <span class="sc">&gt;</span> <span class="fu">quantile</span>(degree, .<span class="dv">75</span>), id, <span class="st">""</span>)), </span>
+<span id="cb13-34"><a href="#cb13-34" aria-hidden="true" tabindex="-1"></a>    <span class="at">size =</span> <span class="dv">2</span>,</span>
+<span id="cb13-35"><a href="#cb13-35" aria-hidden="true" tabindex="-1"></a>    <span class="at">repel =</span> <span class="cn">TRUE</span></span>
+<span id="cb13-36"><a href="#cb13-36" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb13-37"><a href="#cb13-37" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb13-38"><a href="#cb13-38" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Fishing-related Industry Network"</span></span>
+<span id="cb13-39"><a href="#cb13-39" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb13-40"><a href="#cb13-40" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(</span>
+<span id="cb13-41"><a href="#cb13-41" aria-hidden="true" tabindex="-1"></a>    <span class="at">plot.title =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">16</span>,</span>
+<span id="cb13-42"><a href="#cb13-42" aria-hidden="true" tabindex="-1"></a>                              <span class="at">color =</span> <span class="st">"grey20"</span>),</span>
+<span id="cb13-43"><a href="#cb13-43" aria-hidden="true" tabindex="-1"></a>    <span class="at">legend.title =</span> <span class="fu">element_text</span>(),</span>
+<span id="cb13-44"><a href="#cb13-44" aria-hidden="true" tabindex="-1"></a>    <span class="at">legend.position =</span> <span class="st">"bottom"</span>,</span>
+<span id="cb13-45"><a href="#cb13-45" aria-hidden="true" tabindex="-1"></a>    <span class="co"># legend.direction = "horizontal",</span></span>
+<span id="cb13-46"><a href="#cb13-46" aria-hidden="true" tabindex="-1"></a>    <span class="at">legend.background =</span> <span class="fu">element_rect</span>(<span class="at">fill=</span><span class="st">"#dfdfeb"</span>,<span class="at">colour=</span><span class="st">"#dfdfeb"</span>),</span>
+<span id="cb13-47"><a href="#cb13-47" aria-hidden="true" tabindex="-1"></a>    <span class="at">panel.background =</span> <span class="fu">element_rect</span>(<span class="at">fill=</span><span class="st">"#dfdfeb"</span>,<span class="at">colour=</span><span class="st">"#dfdfeb"</span>),</span>
+<span id="cb13-48"><a href="#cb13-48" aria-hidden="true" tabindex="-1"></a>    <span class="at">plot.background =</span> <span class="fu">element_rect</span>(<span class="at">fill=</span><span class="st">"#dfdfeb"</span>,<span class="at">colour=</span><span class="st">"#dfdfeb"</span>),</span>
+<span id="cb13-49"><a href="#cb13-49" aria-hidden="true" tabindex="-1"></a>    <span class="at">plot.margin =</span> <span class="fu">margin</span>(<span class="at">r =</span> <span class="dv">10</span>,</span>
+<span id="cb13-50"><a href="#cb13-50" aria-hidden="true" tabindex="-1"></a>                         <span class="at">l =</span> <span class="dv">10</span>)</span>
+<span id="cb13-51"><a href="#cb13-51" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb13-52"><a href="#cb13-52" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-53"><a href="#cb13-53" aria-hidden="true" tabindex="-1"></a>fishing_network</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<p><img src="fishy_similarities_files/figure-html/unnamed-chunk-12-1.png" class="img-fluid" width="768"></p>
+</div>
+</div>
+</div>
+<div id="tabset-2-7" class="tab-pane" role="tabpanel" aria-labelledby="tabset-2-7-tab">
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Measure degree centrality and save as a column</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="fu">V</span>(multi_graph)<span class="sc">$</span>degree <span class="ot">&lt;-</span> <span class="fu">degree</span>(multi_graph, <span class="at">mode =</span> <span class="st">"all"</span>)</span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Define custom colors for each group</span></span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>group_colors <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"Ultimate Beneficial Owner"</span> <span class="ot">=</span> <span class="st">"#D86171"</span> , </span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>                  <span class="st">"Shareholder"</span> <span class="ot">=</span> <span class="st">"#163759"</span>, </span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>                  <span class="st">"Company Contact"</span> <span class="ot">=</span> <span class="st">"#F39C12"</span> , </span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>                  <span class="st">"Multi-role Entity"</span> <span class="ot">=</span> <span class="st">"#48C9B0"</span>, </span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a>                  <span class="st">"Multi-Industry Company"</span> <span class="ot">=</span> <span class="st">"#766F87"</span>)</span>
+<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">1234</span>)</span>
+<span id="cb14-12"><a href="#cb14-12" aria-hidden="true" tabindex="-1"></a>multi_network <span class="ot">&lt;-</span> multi_graph <span class="sc">%&gt;%</span></span>
+<span id="cb14-13"><a href="#cb14-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggraph</span>(<span class="at">layout =</span> <span class="st">"nicely"</span>) <span class="sc">+</span></span>
+<span id="cb14-14"><a href="#cb14-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_edge_fan</span>(</span>
+<span id="cb14-15"><a href="#cb14-15" aria-hidden="true" tabindex="-1"></a>    <span class="at">alpha =</span> .<span class="dv">6</span>,</span>
+<span id="cb14-16"><a href="#cb14-16" aria-hidden="true" tabindex="-1"></a>    <span class="at">show.legend =</span> <span class="cn">FALSE</span></span>
+<span id="cb14-17"><a href="#cb14-17" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb14-18"><a href="#cb14-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_edge_width</span>(</span>
+<span id="cb14-19"><a href="#cb14-19" aria-hidden="true" tabindex="-1"></a>    <span class="at">range =</span> <span class="fu">c</span>(<span class="fl">0.1</span>,<span class="dv">4</span>)</span>
+<span id="cb14-20"><a href="#cb14-20" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb14-21"><a href="#cb14-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_node_point</span>(</span>
+<span id="cb14-22"><a href="#cb14-22" aria-hidden="true" tabindex="-1"></a>    <span class="fu">aes</span>(<span class="at">size =</span> <span class="fu">ifelse</span>(group <span class="sc">==</span> <span class="st">"Ultimate Beneficial Owner"</span> <span class="sc">|</span> group <span class="sc">==</span> <span class="st">"Multi-role Entity"</span>, <span class="dv">3</span>, degree),</span>
+<span id="cb14-23"><a href="#cb14-23" aria-hidden="true" tabindex="-1"></a>        <span class="at">color =</span> group),</span>
+<span id="cb14-24"><a href="#cb14-24" aria-hidden="true" tabindex="-1"></a>    <span class="at">alpha =</span> .<span class="dv">9</span></span>
+<span id="cb14-25"><a href="#cb14-25" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb14-26"><a href="#cb14-26" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Remove the legend for "degree"</span></span>
+<span id="cb14-27"><a href="#cb14-27" aria-hidden="true" tabindex="-1"></a>  <span class="fu">guides</span>(<span class="at">color =</span> <span class="fu">guide_legend</span>(<span class="at">title =</span> <span class="st">"Role:"</span>),</span>
+<span id="cb14-28"><a href="#cb14-28" aria-hidden="true" tabindex="-1"></a>         <span class="at">size =</span> <span class="st">"none"</span></span>
+<span id="cb14-29"><a href="#cb14-29" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span> </span>
+<span id="cb14-30"><a href="#cb14-30" aria-hidden="true" tabindex="-1"></a>   <span class="co"># Assign custom colors to each group to standardise</span></span>
+<span id="cb14-31"><a href="#cb14-31" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_manual</span>(<span class="at">values =</span> group_colors) <span class="sc">+</span> </span>
+<span id="cb14-32"><a href="#cb14-32" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_node_text</span>(</span>
+<span id="cb14-33"><a href="#cb14-33" aria-hidden="true" tabindex="-1"></a>    <span class="fu">aes</span>(<span class="at">label =</span> <span class="fu">ifelse</span>(degree <span class="sc">&gt;</span> <span class="fu">quantile</span>(degree, .<span class="dv">75</span>), id, <span class="st">""</span>)), </span>
+<span id="cb14-34"><a href="#cb14-34" aria-hidden="true" tabindex="-1"></a>    <span class="at">size =</span> <span class="dv">2</span>,</span>
+<span id="cb14-35"><a href="#cb14-35" aria-hidden="true" tabindex="-1"></a>    <span class="at">repel =</span> <span class="cn">TRUE</span></span>
+<span id="cb14-36"><a href="#cb14-36" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb14-37"><a href="#cb14-37" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb14-38"><a href="#cb14-38" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Multi-industry Company Network"</span></span>
+<span id="cb14-39"><a href="#cb14-39" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb14-40"><a href="#cb14-40" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(</span>
+<span id="cb14-41"><a href="#cb14-41" aria-hidden="true" tabindex="-1"></a>    <span class="at">plot.title =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">16</span>,</span>
+<span id="cb14-42"><a href="#cb14-42" aria-hidden="true" tabindex="-1"></a>                              <span class="at">color =</span> <span class="st">"grey20"</span>),</span>
+<span id="cb14-43"><a href="#cb14-43" aria-hidden="true" tabindex="-1"></a>    <span class="at">legend.title =</span> <span class="fu">element_text</span>(),</span>
+<span id="cb14-44"><a href="#cb14-44" aria-hidden="true" tabindex="-1"></a>    <span class="at">legend.position =</span> <span class="st">"bottom"</span>,</span>
+<span id="cb14-45"><a href="#cb14-45" aria-hidden="true" tabindex="-1"></a>    <span class="co"># legend.direction = "horizontal",</span></span>
+<span id="cb14-46"><a href="#cb14-46" aria-hidden="true" tabindex="-1"></a>    <span class="at">legend.background =</span> <span class="fu">element_rect</span>(<span class="at">fill=</span><span class="st">"#dfdfeb"</span>,<span class="at">colour=</span><span class="st">"#dfdfeb"</span>),</span>
+<span id="cb14-47"><a href="#cb14-47" aria-hidden="true" tabindex="-1"></a>    <span class="at">panel.background =</span> <span class="fu">element_rect</span>(<span class="at">fill=</span><span class="st">"#dfdfeb"</span>,<span class="at">colour=</span><span class="st">"#dfdfeb"</span>),</span>
+<span id="cb14-48"><a href="#cb14-48" aria-hidden="true" tabindex="-1"></a>    <span class="at">plot.background =</span> <span class="fu">element_rect</span>(<span class="at">fill=</span><span class="st">"#dfdfeb"</span>,<span class="at">colour=</span><span class="st">"#dfdfeb"</span>),</span>
+<span id="cb14-49"><a href="#cb14-49" aria-hidden="true" tabindex="-1"></a>    <span class="at">plot.margin =</span> <span class="fu">margin</span>(<span class="at">r =</span> <span class="dv">10</span>,</span>
+<span id="cb14-50"><a href="#cb14-50" aria-hidden="true" tabindex="-1"></a>                         <span class="at">l =</span> <span class="dv">10</span>)</span>
+<span id="cb14-51"><a href="#cb14-51" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb14-52"><a href="#cb14-52" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-53"><a href="#cb14-53" aria-hidden="true" tabindex="-1"></a>multi_network</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<p><img src="fishy_similarities_files/figure-html/unnamed-chunk-13-1.png" class="img-fluid" width="768"></p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="jaccard-similarity-of-industry-classified-networks" class="level1" data-number="4">
+<h1 data-number="4"><span class="header-section-number">4</span> Jaccard Similarity of Industry-classified Networks</h1>
+<p>The <strong>Jaccard similarity index</strong> compares the similarity of two networks on a scale of 0 to 1. The higher the index, the closer the two sets of data are.</p>
+<div class="panel-tabset">
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-3-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-3-1" role="tab" aria-controls="tabset-3-1" aria-selected="true"><strong>I. Define Jaccard Simmilarity Function</strong></a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-3-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-3-2" role="tab" aria-controls="tabset-3-2" aria-selected="false"><strong>II. Loop through each Network Graph pair</strong></a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-3-3-tab" data-bs-toggle="tab" data-bs-target="#tabset-3-3" role="tab" aria-controls="tabset-3-3" aria-selected="false"><strong>III. Create Jaccard Similarity Matrix</strong></a></li></ul>
+<div class="tab-content">
+<div id="tabset-3-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-3-1-tab">
+<div class="cell">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Store all graph objects as a list</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>all_industries <span class="ot">&lt;-</span> <span class="fu">list</span>(industrial_graph, food_graph, seafood_graph, goods_graph, transport_graph, fishing_graph, multi_graph)</span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Create function to calculate jaccard similarity between two network graphs</span></span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>jaccard_sim <span class="ot">&lt;-</span> <span class="cf">function</span>(graph1, graph2) {</span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>  common_edges <span class="ot">&lt;-</span> <span class="fu">intersect</span>(<span class="fu">E</span>(graph1), <span class="fu">E</span>(graph2))</span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a>  jaccard_similarity <span class="ot">&lt;-</span> <span class="fu">length</span>(common_edges) <span class="sc">/</span> (<span class="fu">length</span>(<span class="fu">E</span>(graph1)) <span class="sc">+</span> <span class="fu">length</span>(<span class="fu">E</span>(graph2)) <span class="sc">-</span> <span class="fu">length</span>(common_edges))</span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(jaccard_similarity)</span>
+<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</div>
+<div id="tabset-3-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-3-2-tab">
+<div class="cell">
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Loop through all network graphs and calculate jaccard similarity</span></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>jaccard_similarity <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="dv">0</span>, <span class="at">nrow =</span> <span class="fu">length</span>(all_industries), <span class="at">ncol =</span> <span class="fu">length</span>(all_industries))</span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="fu">length</span>(all_industries)) {</span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (j <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="fu">length</span>(all_industries)) {</span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>    jaccard_similarity[i, j] <span class="ot">&lt;-</span> <span class="fu">jaccard_sim</span>(all_industries[[i]], all_industries[[j]])</span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</div>
+<div id="tabset-3-3" class="tab-pane" role="tabpanel" aria-labelledby="tabset-3-3-tab">
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create dataframe with jaccard similarity matrix</span></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>jaccard_similarity_df <span class="ot">&lt;-</span> <span class="fu">as.data.frame</span>(jaccard_similarity)</span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Assign row and column names according to industry</span></span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>network_titles <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"Industrial"</span>, <span class="st">"Food"</span>, <span class="st">"Seafood"</span>, <span class="st">"Goods"</span>, <span class="st">"Transport"</span>, <span class="st">"Fishing"</span>, <span class="st">"Multi-industry"</span>)</span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a><span class="fu">rownames</span>(jaccard_similarity_df) <span class="ot">&lt;-</span> network_titles</span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a><span class="fu">colnames</span>(jaccard_similarity_df) <span class="ot">&lt;-</span> network_titles</span>
+<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a><span class="fu">kbl</span>(jaccard_similarity_df,</span>
+<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">caption =</span> <span class="st">"Jaccard Similarity Index Comparing Network Graphs"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb17-11"><a href="#cb17-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable_styling</span>(<span class="at">bootstrap_options =</span> <span class="fu">c</span>(<span class="st">"striped"</span>, <span class="st">"hover"</span>, <span class="st">"condensed"</span>, <span class="st">"responsive"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+
+<table class="table table-striped table-hover table-condensed table-responsive" style="margin-left: auto; margin-right: auto;">
+<caption>Jaccard Similarity Index Comparing Network Graphs</caption>
+ <thead>
+  <tr>
+   <th style="text-align:left;">   </th>
+   <th style="text-align:right;"> Industrial </th>
+   <th style="text-align:right;"> Food </th>
+   <th style="text-align:right;"> Seafood </th>
+   <th style="text-align:right;"> Goods </th>
+   <th style="text-align:right;"> Transport </th>
+   <th style="text-align:right;"> Fishing </th>
+   <th style="text-align:right;"> Multi-industry </th>
+  </tr>
+ </thead>
+<tbody>
+  <tr>
+   <td style="text-align:left;"> Industrial </td>
+   <td style="text-align:right;"> 1.0000000 </td>
+   <td style="text-align:right;"> 0.6138614 </td>
+   <td style="text-align:right;"> 0.9462366 </td>
+   <td style="text-align:right;"> 0.7294118 </td>
+   <td style="text-align:right;"> 0.8017241 </td>
+   <td style="text-align:right;"> 0.9731183 </td>
+   <td style="text-align:right;"> 0.7209302 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Food </td>
+   <td style="text-align:right;"> 0.6138614 </td>
+   <td style="text-align:right;"> 1.0000000 </td>
+   <td style="text-align:right;"> 0.5808581 </td>
+   <td style="text-align:right;"> 0.8415842 </td>
+   <td style="text-align:right;"> 0.7656766 </td>
+   <td style="text-align:right;"> 0.5973597 </td>
+   <td style="text-align:right;"> 0.8514851 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Seafood </td>
+   <td style="text-align:right;"> 0.9462366 </td>
+   <td style="text-align:right;"> 0.5808581 </td>
+   <td style="text-align:right;"> 1.0000000 </td>
+   <td style="text-align:right;"> 0.6901961 </td>
+   <td style="text-align:right;"> 0.7586207 </td>
+   <td style="text-align:right;"> 0.9723757 </td>
+   <td style="text-align:right;"> 0.6821705 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Goods </td>
+   <td style="text-align:right;"> 0.7294118 </td>
+   <td style="text-align:right;"> 0.8415842 </td>
+   <td style="text-align:right;"> 0.6901961 </td>
+   <td style="text-align:right;"> 1.0000000 </td>
+   <td style="text-align:right;"> 0.9098039 </td>
+   <td style="text-align:right;"> 0.7098039 </td>
+   <td style="text-align:right;"> 0.9883721 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Transport </td>
+   <td style="text-align:right;"> 0.8017241 </td>
+   <td style="text-align:right;"> 0.7656766 </td>
+   <td style="text-align:right;"> 0.7586207 </td>
+   <td style="text-align:right;"> 0.9098039 </td>
+   <td style="text-align:right;"> 1.0000000 </td>
+   <td style="text-align:right;"> 0.7801724 </td>
+   <td style="text-align:right;"> 0.8992248 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Fishing </td>
+   <td style="text-align:right;"> 0.9731183 </td>
+   <td style="text-align:right;"> 0.5973597 </td>
+   <td style="text-align:right;"> 0.9723757 </td>
+   <td style="text-align:right;"> 0.7098039 </td>
+   <td style="text-align:right;"> 0.7801724 </td>
+   <td style="text-align:right;"> 1.0000000 </td>
+   <td style="text-align:right;"> 0.7015504 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Multi-industry </td>
+   <td style="text-align:right;"> 0.7209302 </td>
+   <td style="text-align:right;"> 0.8514851 </td>
+   <td style="text-align:right;"> 0.6821705 </td>
+   <td style="text-align:right;"> 0.9883721 </td>
+   <td style="text-align:right;"> 0.8992248 </td>
+   <td style="text-align:right;"> 0.7015504 </td>
+   <td style="text-align:right;"> 1.0000000 </td>
+  </tr>
+</tbody>
+</table>
+
+</div>
 </div>
 </div>
 </div>
@@ -504,54 +1133,32 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div class="cell">
 <details>
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Measure directed out-degree centrality and save as a column</span></span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="fu">V</span>(industrial_graph)<span class="sc">$</span>degree <span class="ot">&lt;-</span> <span class="fu">degree</span>(industrial_graph, <span class="at">mode =</span> <span class="st">"all"</span>)</span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">1234</span>)</span>
-<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>industrial_network <span class="ot">&lt;-</span> industrial_graph <span class="sc">%&gt;%</span></span>
-<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggraph</span>(<span class="at">layout =</span> <span class="st">"nicely"</span>) <span class="sc">+</span></span>
-<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_edge_fan</span>(</span>
-<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">alpha =</span> .<span class="dv">6</span>,</span>
-<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">show.legend =</span> <span class="cn">FALSE</span></span>
-<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
-<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_edge_width</span>(</span>
-<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">range =</span> <span class="fu">c</span>(<span class="fl">0.1</span>,<span class="dv">4</span>)</span>
-<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
-<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_node_point</span>(</span>
-<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a>    <span class="fu">aes</span>(<span class="at">size =</span> degree,</span>
-<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a>        <span class="at">color =</span> group),</span>
-<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a>    <span class="at">alpha =</span> .<span class="dv">9</span></span>
-<span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
-<span id="cb8-19"><a href="#cb8-19" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Remove the legend for "degree"</span></span>
-<span id="cb8-20"><a href="#cb8-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">guides</span>(<span class="at">color =</span> <span class="fu">guide_legend</span>(<span class="at">title =</span> <span class="st">"Role:"</span>),</span>
-<span id="cb8-21"><a href="#cb8-21" aria-hidden="true" tabindex="-1"></a>         <span class="at">size =</span> <span class="st">"none"</span></span>
-<span id="cb8-22"><a href="#cb8-22" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span> </span>
-<span id="cb8-23"><a href="#cb8-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_node_text</span>(</span>
-<span id="cb8-24"><a href="#cb8-24" aria-hidden="true" tabindex="-1"></a>    <span class="fu">aes</span>(<span class="at">label =</span> <span class="fu">ifelse</span>(degree <span class="sc">&gt;</span> <span class="fu">quantile</span>(degree, .<span class="dv">75</span>), id, <span class="st">""</span>)), </span>
-<span id="cb8-25"><a href="#cb8-25" aria-hidden="true" tabindex="-1"></a>    <span class="at">size =</span> <span class="dv">2</span>,</span>
-<span id="cb8-26"><a href="#cb8-26" aria-hidden="true" tabindex="-1"></a>    <span class="at">repel =</span> <span class="cn">TRUE</span></span>
-<span id="cb8-27"><a href="#cb8-27" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
-<span id="cb8-28"><a href="#cb8-28" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
-<span id="cb8-29"><a href="#cb8-29" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Industrial Company Network"</span></span>
-<span id="cb8-30"><a href="#cb8-30" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
-<span id="cb8-31"><a href="#cb8-31" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(</span>
-<span id="cb8-32"><a href="#cb8-32" aria-hidden="true" tabindex="-1"></a>    <span class="at">plot.title =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">16</span>,</span>
-<span id="cb8-33"><a href="#cb8-33" aria-hidden="true" tabindex="-1"></a>                              <span class="at">color =</span> <span class="st">"grey20"</span>),</span>
-<span id="cb8-34"><a href="#cb8-34" aria-hidden="true" tabindex="-1"></a>    <span class="at">legend.title =</span> <span class="fu">element_text</span>(),</span>
-<span id="cb8-35"><a href="#cb8-35" aria-hidden="true" tabindex="-1"></a>    <span class="at">legend.position =</span> <span class="st">"bottom"</span>,</span>
-<span id="cb8-36"><a href="#cb8-36" aria-hidden="true" tabindex="-1"></a>    <span class="co"># legend.direction = "horizontal",</span></span>
-<span id="cb8-37"><a href="#cb8-37" aria-hidden="true" tabindex="-1"></a>    <span class="at">legend.background =</span> <span class="fu">element_rect</span>(<span class="at">fill=</span><span class="st">"#dfdfeb"</span>,<span class="at">colour=</span><span class="st">"#dfdfeb"</span>),</span>
-<span id="cb8-38"><a href="#cb8-38" aria-hidden="true" tabindex="-1"></a>    <span class="at">panel.background =</span> <span class="fu">element_rect</span>(<span class="at">fill=</span><span class="st">"#dfdfeb"</span>,<span class="at">colour=</span><span class="st">"#dfdfeb"</span>),</span>
-<span id="cb8-39"><a href="#cb8-39" aria-hidden="true" tabindex="-1"></a>    <span class="at">plot.background =</span> <span class="fu">element_rect</span>(<span class="at">fill=</span><span class="st">"#dfdfeb"</span>,<span class="at">colour=</span><span class="st">"#dfdfeb"</span>),</span>
-<span id="cb8-40"><a href="#cb8-40" aria-hidden="true" tabindex="-1"></a>    <span class="at">plot.margin =</span> <span class="fu">margin</span>(<span class="at">r =</span> <span class="dv">10</span>,</span>
-<span id="cb8-41"><a href="#cb8-41" aria-hidden="true" tabindex="-1"></a>                         <span class="at">l =</span> <span class="dv">10</span>)</span>
-<span id="cb8-42"><a href="#cb8-42" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb8-43"><a href="#cb8-43" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-44"><a href="#cb8-44" aria-hidden="true" tabindex="-1"></a>industrial_network</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Visualize the Jaccard similarity matrix as a heatmap</span></span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>pacman<span class="sc">::</span><span class="fu">p_load</span>(heatmaply)</span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a><span class="fu">heatmaply</span>(<span class="fu">as.matrix</span>(jaccard_similarity_df),</span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>          <span class="at">colors =</span> Blues,</span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>          <span class="at">seriate =</span> <span class="st">"OLO"</span>,</span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a>          <span class="at">main=</span><span class="st">"Jaccard Similarity Scores Comparing Industry Networks"</span>,</span>
+<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a>          <span class="at">margins =</span> <span class="fu">c</span>(<span class="cn">NA</span>,<span class="dv">200</span>,<span class="dv">60</span>,<span class="cn">NA</span>)</span>
+<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a>          ) <span class="sc">%&gt;%</span></span>
+<span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a>  plotly<span class="sc">::</span><span class="fu">layout</span>(<span class="at">plot_bgcolor =</span> <span class="st">"#dfdfeb"</span>,</span>
+<span id="cb18-10"><a href="#cb18-10" aria-hidden="true" tabindex="-1"></a>                <span class="at">paper_bgcolor =</span> <span class="st">"#dfdfeb"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
-<p><img src="fishy_similarities_files/figure-html/unnamed-chunk-7-1.png" class="img-fluid" width="768"></p>
+<div class="plotly html-widget html-fill-item-overflow-hidden html-fill-item" id="htmlwidget-4b912116289de4174b29" style="width:100%;height:568px;"></div>
+<script type="application/json" data-for="htmlwidget-4b912116289de4174b29">{"x":{"data":[{"x":[3.8125,1.75,null,1.75,1.75,null,1.75,1,null,1,1,null,1.75,2.5,null,2.5,2.5,null,2.5,2,null,2,2,null,2.5,3,null,3,3,null,3.8125,5.875,null,5.875,5.875,null,5.875,4.75,null,4.75,4.75,null,4.75,4,null,4,4,null,4.75,5.5,null,5.5,5.5,null,5.5,5,null,5,5,null,5.5,6,null,6,6,null,5.875,7,null,7,7],"y":[0.80876800274342542,0.80876800274342542,null,0.80876800274342542,0.10848444719607638,null,0.10848444719607638,0.10848444719607638,null,0.10848444719607638,0,null,0.10848444719607638,0.10848444719607638,null,0.10848444719607638,0.060210756141794539,null,0.060210756141794539,0.060210756141794539,null,0.060210756141794539,0,null,0.060210756141794539,0.060210756141794539,null,0.060210756141794539,0,null,0.80876800274342542,0.80876800274342542,null,0.80876800274342542,0.46589739739536357,null,0.46589739739536357,0.46589739739536357,null,0.46589739739536357,0.22891276201369551,null,0.22891276201369551,0.22891276201369551,null,0.22891276201369551,0,null,0.22891276201369551,0.22891276201369551,null,0.22891276201369551,0.026169259898097964,null,0.026169259898097964,0.026169259898097964,null,0.026169259898097964,0,null,0.026169259898097964,0.026169259898097964,null,0.026169259898097964,0,null,0.46589739739536357,0.46589739739536357,null,0.46589739739536357,0],"text":["y: 0.80876800","y: 0.80876800",null,"y: 0.80876800","y: 0.80876800",null,"y: 0.10848445","y: 0.10848445",null,"y: 0.10848445","y: 0.10848445",null,"y: 0.10848445","y: 0.10848445",null,"y: 0.10848445","y: 0.10848445",null,"y: 0.06021076","y: 0.06021076",null,"y: 0.06021076","y: 0.06021076",null,"y: 0.06021076","y: 0.06021076",null,"y: 0.06021076","y: 0.06021076",null,"y: 0.80876800","y: 0.80876800",null,"y: 0.80876800","y: 0.80876800",null,"y: 0.46589740","y: 0.46589740",null,"y: 0.46589740","y: 0.46589740",null,"y: 0.22891276","y: 0.22891276",null,"y: 0.22891276","y: 0.22891276",null,"y: 0.22891276","y: 0.22891276",null,"y: 0.22891276","y: 0.22891276",null,"y: 0.02616926","y: 0.02616926",null,"y: 0.02616926","y: 0.02616926",null,"y: 0.02616926","y: 0.02616926",null,"y: 0.02616926","y: 0.02616926",null,"y: 0.46589740","y: 0.46589740",null,"y: 0.46589740","y: 0.46589740"],"type":"scatter","mode":"lines","line":{"width":2.2677165354330708,"color":"rgba(0,0,0,1)","dash":"solid"},"hoveron":"points","showlegend":false,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[3.8125,1.75,1,2.5,2,3,5.875,4.75,4,5.5,5,6,7],"y":[0.80876800274342542,0.10848444719607638,0,0.060210756141794539,0,0,0.46589739739536357,0.22891276201369551,0,0.026169259898097964,0,0,0],"text":["y: 0.80876800","y: 0.10848445","y: 0.00000000","y: 0.06021076","y: 0.00000000","y: 0.00000000","y: 0.46589740","y: 0.22891276","y: 0.00000000","y: 0.02616926","y: 0.00000000","y: 0.00000000","y: 0.00000000"],"type":"scatter","mode":"markers","marker":{"autocolorscale":false,"color":"transparent","opacity":1,"size":null,"symbol":null,"line":{"width":1.8897637795275593,"color":"transparent"}},"hoveron":"points","showlegend":false,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"type":"scatter","mode":"markers","marker":{"color":"rgba(44,160,44,1)","line":{"color":"rgba(44,160,44,1)"}},"error_y":{"color":"rgba(44,160,44,1)"},"error_x":{"color":"rgba(44,160,44,1)"},"line":{"color":"rgba(44,160,44,1)"},"xaxis":"x2","yaxis":"y","frame":null},{"x":[1,2,3,4,5,6,7],"y":[1,2,3,4,5,6,7],"z":[[1,0.93409318310349321,0.87172974345948706,0.42411077925604113,0.26086150995831398,0.24171397180003654,0],[0.93409318310349321,1,0.93586487172974353,0.47552945967960891,0.30764242704956002,0.28795092473905876,0.039370078740157431],[0.87172974345948706,0.93586487172974353,1,0.5269481401031767,0.35442334414080578,0.33418787767808078,0.078740157480314862],[0.42411077925604113,0.47552945967960891,0.5269481401031767,1,0.78480778138026863,0.75956784471708483,0.44094488188976383],[0.26086150995831398,0.30764242704956002,0.35442334414080578,0.78480778138026863,1,0.97225782823658669,0.62204724409448808],[0.24171397180003654,0.28795092473905876,0.33418787767808078,0.75956784471708483,0.97225782823658669,1,0.64566929133858264],[0,0.039370078740157431,0.078740157480314862,0.44094488188976383,0.62204724409448808,0.64566929133858264,1]],"text":[["row: Seafood<br>column: Seafood<br>value: 1.0000","row: Seafood<br>column: Fishing<br>value: 0.9724","row: Seafood<br>column: Industrial<br>value: 0.9462","row: Seafood<br>column: Transport<br>value: 0.7586","row: Seafood<br>column: Goods<br>value: 0.6902","row: Seafood<br>column: Multi-industry<br>value: 0.6822","row: Seafood<br>column: Food<br>value: 0.5809"],["row: Fishing<br>column: Seafood<br>value: 0.9724","row: Fishing<br>column: Fishing<br>value: 1.0000","row: Fishing<br>column: Industrial<br>value: 0.9731","row: Fishing<br>column: Transport<br>value: 0.7802","row: Fishing<br>column: Goods<br>value: 0.7098","row: Fishing<br>column: Multi-industry<br>value: 0.7016","row: Fishing<br>column: Food<br>value: 0.5974"],["row: Industrial<br>column: Seafood<br>value: 0.9462","row: Industrial<br>column: Fishing<br>value: 0.9731","row: Industrial<br>column: Industrial<br>value: 1.0000","row: Industrial<br>column: Transport<br>value: 0.8017","row: Industrial<br>column: Goods<br>value: 0.7294","row: Industrial<br>column: Multi-industry<br>value: 0.7209","row: Industrial<br>column: Food<br>value: 0.6139"],["row: Transport<br>column: Seafood<br>value: 0.7586","row: Transport<br>column: Fishing<br>value: 0.7802","row: Transport<br>column: Industrial<br>value: 0.8017","row: Transport<br>column: Transport<br>value: 1.0000","row: Transport<br>column: Goods<br>value: 0.9098","row: Transport<br>column: Multi-industry<br>value: 0.8992","row: Transport<br>column: Food<br>value: 0.7657"],["row: Goods<br>column: Seafood<br>value: 0.6902","row: Goods<br>column: Fishing<br>value: 0.7098","row: Goods<br>column: Industrial<br>value: 0.7294","row: Goods<br>column: Transport<br>value: 0.9098","row: Goods<br>column: Goods<br>value: 1.0000","row: Goods<br>column: Multi-industry<br>value: 0.9884","row: Goods<br>column: Food<br>value: 0.8416"],["row: Multi-industry<br>column: Seafood<br>value: 0.6822","row: Multi-industry<br>column: Fishing<br>value: 0.7016","row: Multi-industry<br>column: Industrial<br>value: 0.7209","row: Multi-industry<br>column: Transport<br>value: 0.8992","row: Multi-industry<br>column: Goods<br>value: 0.9884","row: Multi-industry<br>column: Multi-industry<br>value: 1.0000","row: Multi-industry<br>column: Food<br>value: 0.8515"],["row: Food<br>column: Seafood<br>value: 0.5809","row: Food<br>column: Fishing<br>value: 0.5974","row: Food<br>column: Industrial<br>value: 0.6139","row: Food<br>column: Transport<br>value: 0.7657","row: Food<br>column: Goods<br>value: 0.8416","row: Food<br>column: Multi-industry<br>value: 0.8515","row: Food<br>column: Food<br>value: 1.0000"]],"colorscale":[[0,"#F7FBFF"],[0.039370078740157431,"#EFF5FC"],[0.078740157480314862,"#E7F0F9"],[0.24171397180003654,"#C7DBEF"],[0.26086150995831398,"#C2D9ED"],[0.28795092473905876,"#BAD6EA"],[0.30764242704956002,"#B3D3E8"],[0.33418787767808078,"#ABCFE5"],[0.35442334414080578,"#A4CDE3"],[0.42411077925604113,"#8ABFDC"],[0.44094488188976383,"#83BBDB"],[0.47552945967960891,"#74B3D8"],[0.5269481401031767,"#62A8D2"],[0.62204724409448808,"#4292C6"],[0.64566929133858264,"#3C8CC3"],[0.75956784471708483,"#1E6EB2"],[0.78480778138026863,"#1A68AE"],[0.87172974345948706,"#08529C"],[0.93409318310349321,"#084185"],[0.93586487172974353,"#084084"],[0.97225782823658669,"#083775"],[1,"#08306B"]],"type":"heatmap","showscale":false,"autocolorscale":false,"showlegend":false,"xaxis":"x","yaxis":"y2","hoverinfo":"text","frame":null},{"x":[1],"y":[1],"name":"99_ed0a68c93f7a094601cba6e663b01fba","type":"scatter","mode":"markers","opacity":0,"hoverinfo":"skip","showlegend":false,"marker":{"color":[0,1],"colorscale":[[0,"#F7FBFF"],[0.003344481605351089,"#F6FAFE"],[0.0066889632107024434,"#F5F9FE"],[0.010033444816053533,"#F4F9FE"],[0.013377926421404621,"#F4F9FE"],[0.016722408026755974,"#F3F8FD"],[0.020066889632107066,"#F3F8FD"],[0.023411371237458154,"#F2F7FD"],[0.026755852842809243,"#F1F7FD"],[0.030100334448160595,"#F0F6FC"],[0.033444816053511683,"#EFF6FC"],[0.036789297658862775,"#EFF6FC"],[0.040133779264214131,"#EFF5FC"],[0.043478260869565216,"#EEF5FC"],[0.046822742474916308,"#EDF4FB"],[0.050167224080267657,"#ECF4FB"],[0.053511705685618749,"#ECF3FB"],[0.056856187290969841,"#ECF3FB"],[0.06020066889632119,"#EBF3FB"],[0.063545150501672282,"#EAF2FA"],[0.066889632107023367,"#E9F2FA"],[0.070234113712374466,"#E8F1FA"],[0.073578595317725815,"#E8F1FA"],[0.0769230769230769,"#E7F0F9"],[0.080267558528427999,"#E7F0F9"],[0.083612040133779347,"#E6F0F9"],[0.086956521739130432,"#E5EFF9"],[0.090301003344481517,"#E4EFF9"],[0.09364548494983288,"#E4EEF8"],[0.096989966555183965,"#E3EEF8"],[0.10033444816053505,"#E2EDF8"],[0.10367892976588641,"#E2EDF8"],[0.1070234113712375,"#E1EDF8"],[0.11036789297658858,"#E1ECF7"],[0.11371237458193995,"#E0ECF7"],[0.11705685618729103,"#DFEBF7"],[0.12040133779264212,"#DEEBF7"],[0.12374581939799321,"#DDEAF6"],[0.12709030100334456,"#DDEAF6"],[0.13043478260869565,"#DDEAF6"],[0.13377926421404673,"#DCE9F6"],[0.1371237458193981,"#DBE9F6"],[0.14046822742474918,"#DAE8F5"],[0.14381270903010027,"#DAE8F5"],[0.14715719063545163,"#D9E7F5"],[0.15050167224080271,"#D9E7F5"],[0.1538461538461538,"#D8E7F5"],[0.15719063545150488,"#D7E6F4"],[0.16053511705685625,"#D7E6F4"],[0.16387959866220733,"#D6E5F4"],[0.16722408026755842,"#D5E5F4"],[0.17056856187290978,"#D5E5F4"],[0.17391304347826086,"#D4E4F3"],[0.17725752508361195,"#D4E4F3"],[0.18060200668896331,"#D3E3F3"],[0.1839464882943144,"#D2E3F3"],[0.18729096989966548,"#D1E2F2"],[0.19063545150501685,"#D1E2F2"],[0.19397993311036793,"#D1E2F2"],[0.19732441471571902,"#D0E1F2"],[0.20066889632107038,"#CFE1F2"],[0.20401337792642146,"#CEE0F1"],[0.20735785953177255,"#CEE0F1"],[0.21070234113712391,"#CDDFF1"],[0.214046822742475,"#CCDFF1"],[0.21739130434782608,"#CCDFF1"],[0.22073578595317717,"#CBDEF0"],[0.22408026755852853,"#CBDEF0"],[0.22742474916387961,"#CADDF0"],[0.2307692307692307,"#C9DDF0"],[0.23411371237458206,"#C8DCEF"],[0.23745819397993315,"#C8DCEF"],[0.24080267558528423,"#C8DCEF"],[0.24414715719063532,"#C7DBEF"],[0.24749163879598668,"#C6DBEF"],[0.25083612040133779,"#C5DAEE"],[0.25418060200668885,"#C4DAEE"],[0.25752508361204024,"#C3D9EE"],[0.2608695652173913,"#C2D9ED"],[0.26421404682274241,"#C1D9ED"],[0.26755852842809374,"#C0D8ED"],[0.27090301003344486,"#BFD8EC"],[0.27424749163879591,"#BED7EC"],[0.27759197324414731,"#BCD7EB"],[0.28093645484949836,"#BBD6EB"],[0.28428093645484948,"#BBD6EB"],[0.28762541806020081,"#BAD6EA"],[0.29096989966555192,"#B9D5EA"],[0.29431438127090298,"#B7D4EA"],[0.29765886287625437,"#B6D4E9"],[0.30100334448160543,"#B5D3E9"],[0.30434782608695654,"#B4D3E8"],[0.30769230769230788,"#B3D3E8"],[0.31103678929765899,"#B2D2E8"],[0.31438127090301005,"#B1D2E7"],[0.31772575250836116,"#B0D1E7"],[0.32107023411371222,"#AFD1E6"],[0.32441471571906361,"#AED0E6"],[0.32775919732441466,"#ACD0E6"],[0.33110367892976578,"#ACD0E6"],[0.33444816053511711,"#ABCFE5"],[0.33779264214046822,"#AACFE5"],[0.34113712374581928,"#A8CEE4"],[0.34448160535117067,"#A7CEE4"],[0.34782608695652173,"#A6CDE3"],[0.35117056856187284,"#A5CDE3"],[0.35451505016722418,"#A4CDE3"],[0.35785953177257529,"#A3CCE3"],[0.36120401337792635,"#A2CBE2"],[0.36454849498327774,"#A1CBE2"],[0.3678929765886288,"#A0CAE1"],[0.37123745819397991,"#9FCAE1"],[0.37458193979933124,"#9DC9E0"],[0.37792642140468236,"#9CC9E0"],[0.38127090301003341,"#9BC8E0"],[0.3846153846153848,"#9AC7E0"],[0.38795986622073586,"#98C7DF"],[0.39130434782608697,"#97C6DF"],[0.39464882943143831,"#96C5DF"],[0.39799331103678942,"#94C5DF"],[0.40133779264214048,"#93C4DE"],[0.40468227424749159,"#92C3DE"],[0.40802675585284293,"#90C2DE"],[0.41137123745819404,"#8FC1DD"],[0.4147157190635451,"#8DC0DD"],[0.41806020066889621,"#8CC0DD"],[0.42140468227424754,"#8BC0DD"],[0.42474916387959866,"#89BFDC"],[0.42809364548494971,"#88BEDC"],[0.4314381270903011,"#87BDDC"],[0.43478260869565216,"#85BCDB"],[0.43812709030100327,"#84BBDB"],[0.44147157190635461,"#82BADB"],[0.44481605351170572,"#81BADB"],[0.44816053511705678,"#80B9DA"],[0.45150501672240817,"#7FB8DA"],[0.45484949832775923,"#7DB8D9"],[0.45819397993311034,"#7BB7D9"],[0.46153846153846168,"#7AB6D9"],[0.46488294314381279,"#79B5D8"],[0.46822742474916385,"#78B5D8"],[0.47157190635451524,"#77B4D8"],[0.47491638795986629,"#75B3D8"],[0.47826086956521741,"#73B2D7"],[0.48160535117056874,"#72B1D7"],[0.48494983277591985,"#71B1D7"],[0.48829431438127091,"#6FB0D6"],[0.49163879598662202,"#6EB0D6"],[0.49498327759197336,"#6DAFD6"],[0.49832775919732447,"#6BAED6"],[0.50167224080267558,"#6AADD5"],[0.50501672240802664,"#69ACD5"],[0.50836120401337803,"#68ABD4"],[0.51170568561872909,"#67ABD4"],[0.51505016722408015,"#66AAD4"],[0.51839464882943154,"#65AAD3"],[0.52173913043478259,"#63A9D3"],[0.52508361204013365,"#62A8D2"],[0.52842809364548504,"#61A7D2"],[0.5317725752508361,"#60A6D1"],[0.53511705685618727,"#5FA6D1"],[0.53846153846153855,"#5EA5D1"],[0.54180602006688972,"#5DA4D0"],[0.54515050167224077,"#5CA3D0"],[0.54849498327759216,"#5AA3CF"],[0.55183946488294322,"#59A2CF"],[0.55518394648829428,"#58A1CE"],[0.55852842809364567,"#58A1CE"],[0.56187290969899673,"#56A0CE"],[0.56521739130434778,"#559FCD"],[0.56856187290969917,"#549ECD"],[0.57190635451505023,"#539DCC"],[0.5752508361204014,"#529CCC"],[0.57859531772575268,"#509BCB"],[0.58193979933110385,"#509BCB"],[0.5852842809364549,"#4F9BCB"],[0.58862876254180596,"#4E9ACA"],[0.59197324414715702,"#4C99CA"],[0.59531772575250841,"#4B98C9"],[0.59866220735785947,"#4A97C9"],[0.60200668896321063,"#4996C8"],[0.60535117056856191,"#4896C8"],[0.60869565217391308,"#4795C8"],[0.61204013377926414,"#4694C7"],[0.61538461538461553,"#4594C7"],[0.61872909698996659,"#4393C6"],[0.62207357859531764,"#4292C6"],[0.62541806020066903,"#4292C6"],[0.62876254180602009,"#4191C5"],[0.63210702341137115,"#4090C5"],[0.63545150501672254,"#3F8FC4"],[0.6387959866220736,"#3E8EC4"],[0.64214046822742477,"#3D8DC3"],[0.64548494983277604,"#3C8CC3"],[0.64882943143812721,"#3C8CC3"],[0.65217391304347827,"#3B8BC2"],[0.65551839464882966,"#3A8AC1"],[0.65886287625418072,"#3989C1"],[0.66220735785953178,"#3888C0"],[0.66555183946488317,"#3787C0"],[0.668896321070234,"#3686BF"],[0.67224080267558528,"#3585BF"],[0.67558528428093667,"#3484BF"],[0.67892976588628751,"#3383BE"],[0.6822742474916389,"#3282BE"],[0.68561872909699018,"#3181BD"],[0.68896321070234101,"#3080BD"],[0.6923076923076924,"#2F7FBC"],[0.69565217391304346,"#2F7FBC"],[0.69899665551839452,"#2E7EBC"],[0.70234113712374591,"#2D7DBB"],[0.70568561872909696,"#2C7CBB"],[0.70903010033444813,"#2B7BBA"],[0.71237458193979941,"#2A7AB9"],[0.71571906354515058,"#2979B9"],[0.71906354515050164,"#2979B9"],[0.72240802675585303,"#2878B8"],[0.72575250836120409,"#2777B8"],[0.72909698996655514,"#2676B7"],[0.73244147157190653,"#2575B7"],[0.73578595317725759,"#2474B6"],[0.73913043478260865,"#2474B6"],[0.74247491638796004,"#2373B6"],[0.7458193979933111,"#2272B5"],[0.74916387959866226,"#2171B5"],[0.75250836120401354,"#2070B4"],[0.75585284280936438,"#1F6FB3"],[0.75919732441471577,"#1E6EB2"],[0.76254180602006716,"#1E6EB2"],[0.76588628762541788,"#1E6DB2"],[0.76923076923076927,"#1D6CB1"],[0.77257525083612066,"#1C6BB0"],[0.7759197324414715,"#1B6AAF"],[0.77926421404682278,"#1A69AE"],[0.78260869565217395,"#1A68AE"],[0.785953177257525,"#1A68AE"],[0.78929765886287639,"#1967AD"],[0.79264214046822745,"#1866AC"],[0.79598662207357851,"#1765AB"],[0.7993311036789299,"#1664AB"],[0.80267558528428096,"#1663AA"],[0.80602006688963201,"#1562A9"],[0.8093645484949834,"#1562A9"],[0.81270903010033446,"#1461A8"],[0.81605351170568563,"#1360A7"],[0.81939799331103691,"#135FA7"],[0.82274247491638808,"#125EA6"],[0.82608695652173914,"#115DA5"],[0.82943143812709053,"#105CA4"],[0.83277591973244158,"#105CA4"],[0.83612040133779264,"#0F5BA3"],[0.83946488294314403,"#0F5AA3"],[0.84280936454849509,"#0E59A2"],[0.84615384615384615,"#0D58A1"],[0.84949832775919754,"#0C57A0"],[0.85284280936454837,"#0C57A0"],[0.85618729096989976,"#0C56A0"],[0.85953177257525104,"#0B559F"],[0.86287625418060188,"#0A549E"],[0.86622073578595327,"#09539D"],[0.86956521739130432,"#08529C"],[0.87290969899665549,"#08519C"],[0.87625418060200677,"#08519B"],[0.87959866220735783,"#08509A"],[0.882943143812709,"#084F99"],[0.88628762541806028,"#084E97"],[0.88963210702341144,"#084C96"],[0.8929765886287625,"#084B95"],[0.89632107023411389,"#084A93"],[0.89966555183946495,"#084A92"],[0.90301003344481601,"#084990"],[0.9063545150501674,"#08488F"],[0.90969899665551845,"#08478E"],[0.91304347826086951,"#08468C"],[0.9163879598662209,"#08458B"],[0.91973244147157196,"#08448A"],[0.92307692307692313,"#084489"],[0.92642140468227441,"#084388"],[0.92976588628762558,"#084286"],[0.93311036789297663,"#084185"],[0.93645484949832802,"#084083"],[0.93979933110367886,"#083F82"],[0.94314381270903014,"#083E81"],[0.94648829431438153,"#083E7F"],[0.94983277591973236,"#083D7E"],[0.95317725752508364,"#083C7D"],[0.95652173913043503,"#083B7B"],[0.95986622073578587,"#083A7A"],[0.96321070234113726,"#083979"],[0.96655518394648832,"#083978"],[0.96989966555183937,"#083876"],[0.97324414715719076,"#083775"],[0.97658862876254182,"#083674"],[0.97993311036789299,"#083572"],[0.98327759197324427,"#083471"],[0.98662207357859533,"#083370"],[0.98996655518394649,"#08336F"],[0.99331103678929777,"#08326D"],[0.99665551839464894,"#08316C"],[1,"#08306B"]],"colorbar":{"bgcolor":"rgba(255,255,255,1)","bordercolor":"transparent","borderwidth":1.8897637795275593,"thickness":23.040000000000003,"title":null,"titlefont":{"color":"rgba(0,0,0,1)","family":"","size":14.611872146118724},"tickmode":"array","ticktext":["0.6","0.7","0.8","0.9","1.0"],"tickvals":[0.045669291338582808,0.28425196850393708,0.52283464566929139,0.76141732283464592,1],"tickfont":{"color":"rgba(0,0,0,1)","family":"","size":11.68949771689498},"ticklen":2,"len":0.5}},"xaxis":"x","yaxis":"y2","frame":null},{"x":[0.80876800274342542,0.80876800274342542,null,0.80876800274342542,0.10848444719607638,null,0.10848444719607638,0.10848444719607638,null,0.10848444719607638,0,null,0.10848444719607638,0.10848444719607638,null,0.10848444719607638,0.060210756141794539,null,0.060210756141794539,0.060210756141794539,null,0.060210756141794539,0,null,0.060210756141794539,0.060210756141794539,null,0.060210756141794539,0,null,0.80876800274342542,0.80876800274342542,null,0.80876800274342542,0.46589739739536357,null,0.46589739739536357,0.46589739739536357,null,0.46589739739536357,0.22891276201369551,null,0.22891276201369551,0.22891276201369551,null,0.22891276201369551,0,null,0.22891276201369551,0.22891276201369551,null,0.22891276201369551,0.026169259898097964,null,0.026169259898097964,0.026169259898097964,null,0.026169259898097964,0,null,0.026169259898097964,0.026169259898097964,null,0.026169259898097964,0,null,0.46589739739536357,0.46589739739536357,null,0.46589739739536357,0],"y":[3.8125,1.75,null,1.75,1.75,null,1.75,1,null,1,1,null,1.75,2.5,null,2.5,2.5,null,2.5,2,null,2,2,null,2.5,3,null,3,3,null,3.8125,5.875,null,5.875,5.875,null,5.875,4.75,null,4.75,4.75,null,4.75,4,null,4,4,null,4.75,5.5,null,5.5,5.5,null,5.5,5,null,5,5,null,5.5,6,null,6,6,null,5.875,7,null,7,7],"text":["y: 0.80876800","y: 0.80876800",null,"y: 0.80876800","y: 0.80876800",null,"y: 0.10848445","y: 0.10848445",null,"y: 0.10848445","y: 0.10848445",null,"y: 0.10848445","y: 0.10848445",null,"y: 0.10848445","y: 0.10848445",null,"y: 0.06021076","y: 0.06021076",null,"y: 0.06021076","y: 0.06021076",null,"y: 0.06021076","y: 0.06021076",null,"y: 0.06021076","y: 0.06021076",null,"y: 0.80876800","y: 0.80876800",null,"y: 0.80876800","y: 0.80876800",null,"y: 0.46589740","y: 0.46589740",null,"y: 0.46589740","y: 0.46589740",null,"y: 0.22891276","y: 0.22891276",null,"y: 0.22891276","y: 0.22891276",null,"y: 0.22891276","y: 0.22891276",null,"y: 0.22891276","y: 0.22891276",null,"y: 0.02616926","y: 0.02616926",null,"y: 0.02616926","y: 0.02616926",null,"y: 0.02616926","y: 0.02616926",null,"y: 0.02616926","y: 0.02616926",null,"y: 0.46589740","y: 0.46589740",null,"y: 0.46589740","y: 0.46589740"],"type":"scatter","mode":"lines","line":{"width":2.2677165354330708,"color":"rgba(0,0,0,1)","dash":"solid"},"hoveron":"points","showlegend":false,"xaxis":"x2","yaxis":"y2","hoverinfo":"text","frame":null},{"x":[0.80876800274342542,0.10848444719607638,0,0.060210756141794539,0,0,0.46589739739536357,0.22891276201369551,0,0.026169259898097964,0,0,0],"y":[3.8125,1.75,1,2.5,2,3,5.875,4.75,4,5.5,5,6,7],"text":["y: 0.80876800","y: 0.10848445","y: 0.00000000","y: 0.06021076","y: 0.00000000","y: 0.00000000","y: 0.46589740","y: 0.22891276","y: 0.00000000","y: 0.02616926","y: 0.00000000","y: 0.00000000","y: 0.00000000"],"type":"scatter","mode":"markers","marker":{"autocolorscale":false,"color":"transparent","opacity":1,"size":null,"symbol":null,"line":{"width":1.8897637795275593,"color":"transparent"}},"hoveron":"points","showlegend":false,"xaxis":"x2","yaxis":"y2","hoverinfo":"text","frame":null}],"layout":{"xaxis":{"domain":[0,0.80000000000000004],"automargin":true,"type":"linear","autorange":false,"range":[0.5,7.5],"tickmode":"array","ticktext":["Seafood","Fishing","Industrial","Transport","Goods","Multi-industry","Food"],"tickvals":[1,2,3,4,5,6,7],"categoryorder":"array","categoryarray":["Seafood","Fishing","Industrial","Transport","Goods","Multi-industry","Food"],"nticks":null,"ticks":"outside","tickcolor":"rgba(51,51,51,1)","ticklen":3.6529680365296811,"tickwidth":0.66417600664176002,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":13.283520132835205},"tickangle":-45,"showline":true,"linecolor":"rgba(0,0,0,1)","linewidth":0.66417600664176002,"showgrid":false,"gridcolor":null,"gridwidth":0,"zeroline":false,"anchor":"y2","title":"","hoverformat":".2f"},"xaxis2":{"domain":[0.80000000000000004,1],"automargin":true,"showticklabels":false,"showgrid":false,"zeroline":false,"anchor":"y2","type":"linear","autorange":false,"range":[0,0.80876800274342542],"tickmode":"array","ticktext":["0.0","0.2","0.4","0.6","0.8"],"tickvals":[0,0.20000000000000001,0.40000000000000002,0.60000000000000009,0.80000000000000004],"categoryorder":"array","categoryarray":["0.0","0.2","0.4","0.6","0.8"],"nticks":null,"ticks":"","tickcolor":null,"ticklen":3.6529680365296811,"tickwidth":0,"tickfont":{"color":null,"family":null,"size":0},"tickangle":-0,"showline":false,"linecolor":null,"linewidth":0,"gridcolor":null,"gridwidth":0,"title":{"text":"","font":{"color":null,"family":null,"size":0}},"hoverformat":".2f"},"yaxis2":{"domain":[0,0.80000000000000004],"automargin":true,"type":"linear","autorange":false,"range":[0.5,7.5],"tickmode":"array","ticktext":["Seafood","Fishing","Industrial","Transport","Goods","Multi-industry","Food"],"tickvals":[1,2,3,4,5,6,7],"categoryorder":"array","categoryarray":["Seafood","Fishing","Industrial","Transport","Goods","Multi-industry","Food"],"nticks":null,"ticks":"outside","tickcolor":"rgba(51,51,51,1)","ticklen":3.6529680365296811,"tickwidth":0.66417600664176002,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":13.283520132835205},"tickangle":-0,"showline":true,"linecolor":"rgba(0,0,0,1)","linewidth":0.66417600664176002,"showgrid":false,"gridcolor":null,"gridwidth":0,"zeroline":false,"anchor":"x","title":"","hoverformat":".2f"},"yaxis":{"domain":[0.80000000000000004,1],"automargin":true,"showticklabels":false,"showgrid":false,"zeroline":false,"anchor":"x","type":"linear","autorange":false,"range":[0,0.80876800274342542],"tickmode":"array","ticktext":["0.0","0.2","0.4","0.6","0.8"],"tickvals":[0,0.20000000000000001,0.40000000000000002,0.60000000000000009,0.80000000000000004],"categoryorder":"array","categoryarray":["0.0","0.2","0.4","0.6","0.8"],"nticks":null,"ticks":"","tickcolor":null,"ticklen":3.6529680365296811,"tickwidth":0,"tickfont":{"color":null,"family":null,"size":0},"tickangle":-0,"showline":false,"linecolor":null,"linewidth":0,"gridcolor":null,"gridwidth":0,"title":{"text":"","font":{"color":null,"family":null,"size":0}},"hoverformat":".2f"},"annotations":[],"shapes":[{"type":"rect","fillcolor":null,"line":{"color":null,"width":0,"linetype":[]},"yref":"paper","xref":"paper","x0":0,"x1":0.80000000000000004,"y0":0.80000000000000004,"y1":1},{"type":"rect","fillcolor":null,"line":{"color":null,"width":0,"linetype":[]},"yref":"paper","xref":"paper","x0":0,"x1":0.80000000000000004,"y0":0,"y1":0.80000000000000004},{"type":"rect","fillcolor":null,"line":{"color":null,"width":0,"linetype":[]},"yref":"paper","xref":"paper","x0":0.80000000000000004,"x1":1,"y0":0,"y1":0.80000000000000004}],"images":[],"margin":{"t":60,"r":null,"b":111.58156911581573,"l":200},"font":{"color":"rgba(0,0,0,1)","family":"","size":14.611872146118724},"showlegend":false,"legend":{"bgcolor":"rgba(255,255,255,1)","bordercolor":"transparent","borderwidth":1.8897637795275593,"font":{"color":"rgba(0,0,0,1)","family":"","size":11.68949771689498},"title":{"text":"","font":{"color":"rgba(0,0,0,1)","family":"","size":14.611872146118724}},"y":1,"yanchor":"top"},"hovermode":"closest","barmode":"relative","paper_bgcolor":"#dfdfeb","title":"Jaccard Similarity Scores Comparing Industry Networks","plot_bgcolor":"#dfdfeb"},"attrs":{"85860a45a45":{"xend":{},"yend":{},"colour":{},"linetype":{},"size":{},"x":{},"y":{},"type":"scatter"},"8582978643f":{"colour":{},"shape":{},"size":{},"x":{},"y":{}},"8584b1f3747":{"alpha_stroke":1,"sizes":[10,100],"spans":[1,20]},"85845682bb8":{"x":{},"y":{},"fill":{},"text":{},"type":"heatmap"},"858267271bd":{"xend":{},"yend":{},"colour":{},"linetype":{},"size":{},"x":{},"y":{},"type":"scatter"},"8586d78531a":{"colour":{},"shape":{},"size":{},"x":{},"y":{}}},"source":"A","config":{"doubleClick":"reset","modeBarButtonsToAdd":["hoverclosest","hovercompare"],"showSendToCloud":false,"displaylogo":false,"modeBarButtonsToRemove":["sendDataToCloud","select2d","lasso2d","autoScale2d","hoverClosestCartesian","hoverCompareCartesian","sendDataToCloud"]},"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.20000000000000001,"selected":{"opacity":1},"debounce":0},"subplot":true,"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
 </div>
+</div>
+<div class="alertbox alert">
+<p><strong>Similarities in Network Structures Across Industries:</strong> Similarities in Network structure can be derived from Jaccard Similarity (JS) scores presented in the heatmap. The lighter the tile, the less similar these ‘groups’ are.</p>
+<ul>
+<li><strong>Highly similar industries:</strong>
+<ul>
+<li><strong>Multi-industry &amp; Consumer Goods</strong> as well as <strong>Fishing &amp; Seafood-processing Industries</strong> have the highest JS index of nearly 1.0, suggestive of almost the same network structures.</li>
+<li>The networks of <strong>Multi-industry &amp; Consumer Goods</strong> feature Ultimate Beneficial Owners, as well as multiple companies with large numbers of shareholders within the network structure</li>
+<li><strong>Fishing &amp; Seafood-processing Industries</strong> networks are void of Ultimate Beneficial Owners, but feature multi-role entities and fewer peripheral ‘clusters’</li>
+</ul></li>
+</ul>
 </div>
 
 
