@@ -22,14 +22,51 @@ This study aims to use visual analytics to
 -   **measure similarity of business groups**
 -   **provide evidence for and against the case that anomalous companies are involved in illegal fishing**
 
+This will be investigated through both **visual** and **quantitative** means: visualising the networks from various industries present in the network graph could help identify if *anomalous* network structures uncovered in *Fishy Business* are more prominent or present in certain industries. Network Similarity measures will also be used to quantify these similarities from the graph objects.
+
+```{mermaid}
+%%| fig-width: 7
+%%{
+  init: {
+    "theme": "base",
+    "themeVariables": {
+      "primaryColor": "#d8e8e6",
+      "primaryTextColor": "#325985",
+      "primaryBorderColor": "#325985",
+      "lineColor": "#325985",
+      "secondaryColor": "#cedded",
+      "tertiaryColor": "#fff" 
+      }
+  }
+}%%
+
+flowchart LR
+    A{Overall\nNetwork} --> B{Industries}
+    B --> C(Visual Similarities)
+    B --> D(Similarity Measures) -.-> E[Jaccard Similarity]
+    D -.-> F[Orbit Distribution]
+    C -.->|Similar?|H[Network Structures] --- I[Overlapping\nOwnership]
+    H --- J[Connected\nClusters]
+```
+
 # Data Preparation
 
 ## R Packages
 
+The following packages are used for this study:
+
+-   `tidyverse`, a collection of packages for data analysis (particularly dplyr for data manipulation)
+
+-   `ggraph`, `igraph` and `visNetwork` for generating network graph visuals
+
+-   `NetworkSim` for calculation of Similary Measures
+
+-   `kableExtra` for styling tables from dataframes
+
 ```{r intstall-packages}
 #| code-fold: false
 #| message: false
-pacman::p_load(tidyverse, ggrepel, DT, kableExtra, ggplot2, scales, ggthemes, visNetwork, ggraph, igraph, gganimate, tidygraph, ggrain, patchwork, ggpubr, htmlwidgets)
+pacman::p_load(tidyverse, ggrepel, DT, kableExtra, ggplot2, scales, ggthemes, visNetwork, ggraph, igraph, gganimate, tidygraph, ggpubr, htmlwidgets, NetworkSim)
 ```
 
 ## Loading the Data
@@ -42,12 +79,12 @@ mc3_links_new <- read_csv("data/mc3_links_new.csv")
 mc3_nodes_all <- read_csv("data/mc3_shinynodes.csv")
 ```
 
-# Network Structures By Industry
+# Visualising Network Structures By Industry
 
 The following groups were derived from topic modeling of products and services offered by companies in the data:
 
 | **Topic**\nNo. | **Industry**        | **Description**                                                 |
-|:----------------:|------------------|-------------------------------------|
+|:-----------------:|-------------------|-----------------------------------|
 |     **1**      | Industrial          | Manages equipment, machinery and other industrial materials     |
 |     **2**      | Food                | Vegetables, meat, fruits and other groceries                    |
 |     **3**      | Seafood-processing  | Packaging, canning, manufacturing of marine or seafood products |
@@ -139,6 +176,7 @@ links_multi <- mc3_links_new %>%
 ## **III. Get unique source and target from filtered links**
 
 ```{r}
+#| code-fold: false
 # Overall Companies
 links_source <- links_industry %>%
   distinct(source) %>%
@@ -215,6 +253,7 @@ links_target7 <- links_multi %>%
 ## **IV. Bind links together to get overall nodes dataframe**
 
 ```{r}
+#| code-fold: false
 # Overall Companies
 nodes_industry_new <- bind_rows(links_source, links_target) %>%
   left_join(mc3_nodes_all, by = "id") %>%
@@ -304,7 +343,6 @@ multi_graph <- tbl_graph(nodes = nodes_multi_new,
 :::
 
 ::: panel-tabset
-
 ## **Industrial Companies**
 
 ```{r}
@@ -606,6 +644,7 @@ transport_network <- transport_graph %>%
 
 transport_network
 ```
+
 ## **Fishing-related Companies**
 
 ```{r}
@@ -727,12 +766,22 @@ multi_network
 ```
 :::
 
-# Jaccard Similarity of Industry-classified Networks  
+::: {.alertbox .alert data-latex="alert"}
+**Initial Insights from Visualisations:**
 
-The **Jaccard similarity index** compares the similarity of two networks on a scale of 0 to 1. The higher the index, the closer the two sets of data are.
+-   The networks of **Multi-industry & Consumer Goods** feature Ultimate Beneficial Owners, as well as multiple companies with large numbers of shareholders within the network structure
+-   There are many single-linked connections within the network structures, which suggests that the missing 'links' are filled with connections to companies in other industries.
+:::
+
+# Quantifying Network Similarity
+
+## Jaccard Similarity Index
+
+The **Jaccard similarity index** compares the presence or absence of edges (links) between pairs of nodes in the networks, calculating the ratio of the number of common edges to the total number of edges in both networks. A higher Jaccard Similarity score thus suggests a greater overlap in edge connections, which makes the networks relatively more similar in terms of overall *connectivity*.
+
+The measure is calculated for each pair of Industry-classified networks, with the data stored as a matrix. This is then visualised through a heatmap:
 
 ::: panel-tabset
-
 ## **I. Define Jaccard Simmilarity Function**
 
 ```{r}
@@ -764,6 +813,7 @@ for (i in 1:length(all_industries)) {
 ## **III. Create Jaccard Similarity Matrix**
 
 ```{r}
+#| code-fold: false
 # Create dataframe with jaccard similarity matrix
 jaccard_similarity_df <- as.data.frame(jaccard_similarity)
 
@@ -776,7 +826,6 @@ kbl(jaccard_similarity_df,
     caption = "Jaccard Similarity Index Comparing Network Graphs") %>%
   kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"))
 ```
-
 :::
 
 ```{r}
@@ -792,20 +841,245 @@ heatmaply(as.matrix(jaccard_similarity_df),
           ) %>%
   plotly::layout(plot_bgcolor = "#dfdfeb",
                 paper_bgcolor = "#dfdfeb")
-```  
+```
 
+## Orbit Distribution Agreement (ODA)
 
-::: {.alertbox .alert data-latex="alert"}
+This measure provides a way to compare the local structural patterns between networks, focusing on the distribution of orbit types. It captures the similarity or dissimilarity in the occurrence of specific subgraph patterns within the network, which can provide insights into their functional properties, evolution, or dynamics.
 
-**Similarities in Network Structures Across Industries:**
-Similarities in Network structure can be derived from Jaccard Similarity (JS) scores presented in the heatmap. The lighter the tile, the less similar these 'groups' are. 
+::: panel-tabset
+## **I. Define Structural Equivalence Function**
 
-- **Highly similar industries:**  
-  - **Multi-industry & Consumer Goods** as well as **Fishing & Seafood-processing Industries** have the highest JS index of nearly 1.0, suggestive of almost the same network structures. 
-  - The networks of **Multi-industry & Consumer Goods** feature Ultimate Beneficial Owners, as well as multiple companies with large numbers of shareholders within the network structure
-  - **Fishing & Seafood-processing Industries** networks are void of Ultimate Beneficial Owners, but feature multi-role entities and fewer peripheral 'clusters'
+```{r}
+#| code-fold: false
+# Store all graph objects as a list
+all_industries <- list(industrial_graph, food_graph, seafood_graph, goods_graph, transport_graph, fishing_graph, multi_graph)
 
+# Create function to calculate oda between two network graphs
+net_oda <- function(graph1, graph2) {
+  calc <- netODA(graph1, graph2)
+  return(calc)
+}
+```
+
+## **II. Loop through each Network Graph pair**
+
+```{r}
+#| code-fold: false
+# Loop through all network graphs and calculate net ODA
+netOda_matrix <- matrix(0, nrow = length(all_industries), ncol = length(all_industries))
+for (i in 1:length(all_industries)) {
+  for (j in 1:length(all_industries)) {
+    netOda_matrix[i, j] <- net_oda(all_industries[[i]], all_industries[[j]])
+  }
+}
+```
+
+## **III. Create net ODA Matrix**
+
+```{r}
+#| code-fold: false
+# Create dataframe with jaccard similarity matrix
+netOda_df <- as.data.frame(netOda_matrix)
+
+# Assign row and column names according to industry
+rownames(netOda_df) <- network_titles
+colnames(netOda_df) <- network_titles
+
+kbl(netOda_df,
+    caption = "Orbit Distribution Agreement of Network Graphs") %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"))
+```
 :::
 
+```{r}
+#| fig-width: 8
+#| fig-height: 7
+# Visualize the net ODA matrix as a heatmap
+heatmaply(as.matrix(netOda_df),
+          colors = Greens,
+          seriate = "OLO",
+          main="Orbit Distribution Agreement Across Industry Networks",
+          margins = c(NA,200,60,NA)
+          ) %>%
+  plotly::layout(plot_bgcolor = "#dfdfeb",
+                paper_bgcolor = "#dfdfeb")
+```
 
-  
+::: {.alertbox .alert data-latex="alert"}
+**Similarities in Network Structures Across Industries:**
+
+Similarities in Network structure can be derived from both Jaccard Similarity (JS) and Orbit Distribution Agreement (ODA) scores presented in the heatmap. The lighter the tile, the less similar these 'groups' are.
+
+-   **Highly similar industries:**
+    -   **Fishing & Seafood-processing Industries** have the very high JS and ODA index of nearly 1.0, suggestive of almost identical network structures.
+    -   **Seafood & Industrial** and **Fishing & Industrial** structures also scored nearly 1.0 for both similarity measures. This suggests that these industries may be overlapping, highly related or interconnected with each other.
+:::
+
+# A *Fishy* Network?
+
+## Industrial, Fishing-related and Seafood-processing Companies
+
+```{r}
+# industrial, fishing and seafood companies
+nodes_fishy <- nodes_industry %>%
+  filter(group =="Industrial Company" | group =="Fishing-related Company" | group =="Seafood-processing Company")
+
+# Overall links
+links_fishy <- mc3_links_new %>%
+  filter(source %in% nodes_fishy$id)
+
+# Overall nodes from links data
+links_fishy_source <- links_fishy %>%
+  distinct(source) %>%
+  rename("id" = "source")
+
+links_fishy_target <- links_fishy %>%
+  distinct(target) %>%
+  rename("id" = "target")
+
+# Overall Companies
+nodes_fishy_new <- bind_rows(links_fishy_source, links_fishy_target) %>%
+  left_join(mc3_nodes_all, by = "id") %>%
+  select(id, group, revenue_group, transboundary)
+
+links_fishy_new <- links_fishy %>%
+  rename("from" = "source",
+         "to" = "target")
+```
+
+```{r}
+net5 <-
+  visNetwork(
+    nodes_fishy_new, 
+    links_fishy_new,
+    width = "100%",
+    main = list(text = "Fishing, Seafood and Industrial Company Networks",
+                style = "font-size:17x;
+                weight:bold;
+                text-align:right;")
+  ) %>%
+  visIgraphLayout(
+    layout = "layout_with_fr"
+  ) %>%
+  visGroups(groupname = "Industrial Company",
+            shape = "icon",
+            icon = list(code = "f013",
+                        size = 45,
+                        color = "#51585D")) %>%
+  visGroups(groupname = "Seafood-processing Company",
+            shape = "icon",
+            icon = list(code = "f578",
+                        size = 45,
+                        color = "#B78EA4")) %>%
+  visGroups(groupname = "Fishing-related Company",
+            shape = "icon",
+            icon = list(code = "f21a",
+                        size = 45,
+                        color = "#629DBB")) %>%
+  visGroups(groupname = "Ultimate Beneficial Owner",
+            color = "#D86171") %>% 
+  visGroups(groupname = "Shareholder",
+            color = "#163759") %>% 
+  visGroups(groupname = "Company Contact",
+            color = "#F39C12") %>% 
+  visGroups(groupname = "Multi-role Entity",
+            color = "#48C9B0") %>% 
+  visLegend() %>%
+  visEdges() %>%
+  addFontAwesome() %>%
+  visOptions(
+  # Specify additional Interactive Elements
+    highlightNearest = list(enabled = T, degree = 2, hover = T),
+  # Add drop-down menu to filter by company name
+    nodesIdSelection = TRUE,
+  # Add drop-down menu to filter by category
+    selectedBy = "group",
+    collapse = TRUE) %>%
+  visInteraction(navigationButtons = TRUE)
+
+net5
+```
+
+## Consumer Goods and Transport-logistics Industries
+
+```{r}
+# Consumer Goods and Transport Industries
+nodes_fishy2 <- nodes_industry %>%
+  filter(group =="Consumer-goods Company" | group =="Transport-logistics Company")
+
+# Overall links
+links_fishy2 <- mc3_links_new %>%
+  filter(source %in% nodes_fishy$id)
+
+# Overall nodes from links data
+links_fishy2_source <- links_fishy2 %>%
+  distinct(source) %>%
+  rename("id" = "source")
+
+links_fishy2_target <- links_fishy2 %>%
+  distinct(target) %>%
+  rename("id" = "target")
+
+# Overall Companies
+nodes_fishy2_new <- bind_rows(links_fishy2_source, links_fishy2_target) %>%
+  left_join(mc3_nodes_all, by = "id") %>%
+  select(id, group, revenue_group, transboundary)
+
+links_fishy2_new <- links_fishy2 %>%
+  rename("from" = "source",
+         "to" = "target")
+```
+
+```{r}
+net6 <-
+  visNetwork(
+    nodes_fishy2_new, 
+    links_fishy2_new,
+    width = "100%",
+    main = list(text = "Consumer-goods and Transport-logistics Networks",
+                style = "font-size:17x;
+                weight:bold;
+                text-align:right;")
+  ) %>%
+  visIgraphLayout(
+    layout = "layout_with_fr"
+  ) %>%
+  visGroups(groupname = "Industrial Company",
+            shape = "icon",
+            icon = list(code = "f013",
+                        size = 45,
+                        color = "#51585D")) %>%
+  visGroups(groupname = "Seafood-processing Company",
+            shape = "icon",
+            icon = list(code = "f578",
+                        size = 45,
+                        color = "#B78EA4")) %>%
+  visGroups(groupname = "Fishing-related Company",
+            shape = "icon",
+            icon = list(code = "f21a",
+                        size = 45,
+                        color = "#629DBB")) %>%
+  visGroups(groupname = "Ultimate Beneficial Owner",
+            color = "#D86171") %>% 
+  visGroups(groupname = "Shareholder",
+            color = "#163759") %>% 
+  visGroups(groupname = "Company Contact",
+            color = "#F39C12") %>% 
+  visGroups(groupname = "Multi-role Entity",
+            color = "#48C9B0") %>% 
+  visLegend() %>%
+  visEdges() %>%
+  addFontAwesome() %>%
+  visOptions(
+  # Specify additional Interactive Elements
+    highlightNearest = list(enabled = T, degree = 2, hover = T),
+  # Add drop-down menu to filter by company name
+    nodesIdSelection = TRUE,
+  # Add drop-down menu to filter by category
+    selectedBy = "group",
+    collapse = TRUE) %>%
+  visInteraction(navigationButtons = TRUE)
+
+net6
+```
