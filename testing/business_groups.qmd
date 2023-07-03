@@ -1,0 +1,97 @@
+---
+title: "Business_Groups"
+date: "7/1/2023"
+date-modified: "`r Sys.Date()`"
+format:
+  html:
+    code-fold: true
+    code-summary: "Show the code"
+execute:
+  warning: False
+  echo: True
+  eval: True
+---
+Loading the packages:
+```{r}
+pacman::p_load(jsonlite, tidygraph, ggraph, visNetwork, ggforce, tidytext, tidyverse, skimr, patchwork, ggdist, ggridges, ggthemes, scales, lsa, topicmodels, ldatuning, dplyr, igraph)
+```
+
+Loading the data:
+
+```{r}
+mc3_data <-
+  jsonlite::fromJSON("data/MC3.json")
+
+mc3_shinynodes <- read_csv("data/mc3_shinynodes.csv")
+```
+
+wrangling the data
+```{r}
+# creating the edges
+mc3_edges <-
+  as_tibble(mc3_data$links) %>%
+    #distinct() %>%
+  mutate(source = as.character(source),
+         target = as.character(target),
+         type = as.character(type)) %>%
+  group_by(source, target, type) %>%
+  summarise(weights = n()) %>%
+  filter(source!=target) %>%
+  ungroup()
+``` 
+
+```{r}
+mc3_edges2 <- 
+  left_join(mc3_edges, mc3_shinynodes, by = c("source" = "id")) %>%
+  select(-...1) %>%
+  rename("from" = "source",
+         "to" = "target")
+```
+
+```{r}
+mc3_edges3 <- mc3_edges2[!is.na(mc3_edges2$group), ]
+```
+
+```{r}
+# Creating the nodes file from the mc3_edges_filtered data
+nodes_filtered <- rbind(
+  mc3_edges3 %>% distinct(from) %>% rename("id" = "from"),
+  mc3_edges3 %>% distinct(to) %>% rename("id" = "to"))
+
+nodes_filtered <-left_join(nodes_filtered, mc3_shinynodes, by = c("id" = "id")) %>%
+  select(id, group)
+```
+
+```{r}
+visNetwork(
+    nodes_filtered, 
+    mc3_edges3
+  ) %>%
+  visIgraphLayout(
+    layout = "layout_with_fr"
+  ) %>%
+  visGroups(groupname = "unknown",
+            color = "lightblue") %>%
+  visGroups(groupname = "Transport-logistics Company",
+            color = "red") %>%
+  visGroups(groupname = "Fishing-related Company",
+            color = "blue") %>%
+  visGroups(groupname = "Multi-Industry Company",
+            color = "green") %>%
+  visGroups(groupname = "Food Company",
+            color = "grey") %>%
+  visGroups(groupname = "Seafood-processing Company",
+            color = "yellow") %>%
+  visGroups(groupname = "Consumer-goods Company",
+            color = "orange") %>%
+  visLegend() %>%
+  visEdges(
+    arrows = "to"
+  ) %>%
+  visOptions(
+    highlightNearest = list(enabled = T, degree = 2, hover = T),
+    nodesIdSelection = TRUE,
+    selectedBy = "group",
+    collapse = TRUE)
+```
+
