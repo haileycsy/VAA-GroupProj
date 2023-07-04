@@ -46,3 +46,6 @@ I. Entities with *Fishy* Data patterns\
 II. Grouping options for the Network, visualised in an interactive Network Graph (visNetwork)\
 III. Proposed Clusters based on user input on clustering criteria\
 IV. Evaluative metrics applied to Network Graph II
+
+
+[link to github repository](https://github.com/haileycsy/VAA-GroupProj)
