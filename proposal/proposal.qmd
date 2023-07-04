@@ -4,8 +4,6 @@ title-block-banner: true
 toc: true
 ---
 
-change something else hi leo hi hailey
-
 <font size = "6"> **Fishy Business**</font>
 
 # {{< fa fish-fins >}} Project Overview
