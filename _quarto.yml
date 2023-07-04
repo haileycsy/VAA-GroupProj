@@ -21,11 +21,12 @@ website:
         href: mc3_2/fishy_similarities.html
       - text: "Shiny App"
         menu:
-          - text: "Anomalous Structures"
-            href: about.html
-          - text: "Similarities"
-            href: about.html
-            
+          - text: "User Guide"
+            href: shinyapp/shinyapp1.html
+          - text: "Shiny App"
+            href: shinyapp/shinyapp2.html
+      - text: "Project Overview"
+        href: poster/poster.html
 format:
   html:
     grid:

@@ -985,7 +985,7 @@ ggplot(
 **The companies can generally be classified under these 6 Industries:**
 
 | **Topic**\nNo. | **Industry**        | **Description**                                                 |
-|:----------------:|------------------|-------------------------------------|
+|:----------------:|------------------|------------------------------------|
 |     **1**      | Industrial          | Manages equipment, machinery and other industrial materials     |
 |     **2**      | Food                | Vegetables, meat, fruits and other groceries                    |
 |     **3**      | Seafood-processing  | Packaging, canning, manufacturing of marine or seafood products |
@@ -1143,7 +1143,6 @@ Revealing the company ownership and company contact structure through network gr
 -   Beneficial Owners of higher number of Companies
 -   Company Contacts of higher number of Companies
 -   Companies with Transboundary Operations
-
 :::
 
 ## Companies with High Revenue & High Number of Beneficial Owners
@@ -1248,7 +1247,6 @@ net1
 
 -   Drakensberg Limited Liability Company & Haryana S Catchers OAO Enterprises
 -   shi ren yu Barge & Isla del Este Ltd
-
 :::
 
 ## Beneficial Owners of 3 or More Companies
@@ -1448,15 +1446,11 @@ net3 <-
   visInteraction(navigationButtons = TRUE)
 
 net3
-```  
-  
-  
-  
-   
-::: {.alertbox .alert data-latex="alert"}
+```
 
+::: {.alertbox .alert data-latex="alert"}
 **Anomalous Company Structures of Company Contacts:**\
-Similar to the structures present in the Beneficial Ownership networks, there are 2 *fishy* structures to highlight: shared company contacts (completely overlapping company contacts) among multiple companies and interlinked company contact networks (split networks linked by contacts to a similar company). 
+Similar to the structures present in the Beneficial Ownership networks, there are 2 *fishy* structures to highlight: shared company contacts (completely overlapping company contacts) among multiple companies and interlinked company contact networks (split networks linked by contacts to a similar company).
 
 -   **Shared Company Contacts**
     -   **Megan Brooks & John Koch** are both company contacts of Atlantico Sur Corporation Breakwater, Guinea Gulf America AS & Son's and Nautica del Sol Pelican
@@ -1464,7 +1458,6 @@ Similar to the structures present in the Beneficial Ownership networks, there ar
 -   **Interlinked Networks**
     -   **Sean Baxter & Daniel Rodriguez** are both company contacts of Greek Octobus Limited Liability Company
     -   **Gregory Kennedy & Justin Robles DDS** are both company contacts of Playa de la Luna CJSC and Kerala Market Tidal flat
-    
 :::
 
 ## Companies with Transboundary Operations
@@ -1577,18 +1570,14 @@ net4 <-
   visInteraction(navigationButtons = TRUE)
 
 net4
-```  
+```
 
-  
-   
 ::: {.alertbox .alert data-latex="alert"}
-
 **No Presence of Interlinked Networks for Transboundary Operations:**\
-Unlike the previous networks of Beneficial Ownership and Company Contacts, there seem to be no interlinks between companies with transboundary operations.  
+Unlike the previous networks of Beneficial Ownership and Company Contacts, there seem to be no interlinks between companies with transboundary operations.
 
-- **Aqua Aura SE Marine life**, the company with highest number of operating countries, is only linked to 3 Beneficial Owners and 3 Company Contacts, none of whom were flagged out in previous *fishy* network structures
-- Lack of interlinks suggest that anomalous structures may be more efficiently scoped out through examining other variables instead. 
-
+-   **Aqua Aura SE Marine life**, the company with highest number of operating countries, is only linked to 3 Beneficial Owners and 3 Company Contacts, none of whom were flagged out in previous *fishy* network structures
+-   Lack of interlinks suggest that anomalous structures may be more efficiently scoped out through examining other variables instead.
 :::
 
 # A Fishy Network: Shiny App
@@ -1598,7 +1587,7 @@ Exploratory analysis thus far has revealed some underlying structures of various
 The "group" that the entity is assigned is based on the following roles:
 
 | Group                         | Logic                                                                                        |
-|---------------------|---------------------------------------------------|
+|----------------------|--------------------------------------------------|
 | **Ultimate Beneficial Owner** | Beneficial Owner of \> 3 Companies, a key player in the network                              |
 | **Multi-role Entity**         | Plays multiple roles within the network, may be a key personnel or broker within the network |
 | **Shareholder**               | Beneficial Owner with a stake in a company                                                   |
@@ -1684,8 +1673,9 @@ final_nodes_update <- final_nodes %>%
 final_nodes_update <- bind_rows(final_nodes_update, link_overlaps, links_target) 
 final_nodes_update$group <- ifelse(is.na(final_nodes_update$group), "unknown", final_nodes_update$group)
 ```
-:::  
-.  
+:::
+
+.
 
 **References**
 
