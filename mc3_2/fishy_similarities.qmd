@@ -59,7 +59,7 @@ The following packages are used for this study:
 
 -   `ggraph`, `igraph` and `visNetwork` for generating network graph visuals
 
--   `NetworkSim` for calculation of Similary Measures
+-   `NetworkSim` for calculation of Similarity Measures
 
 -   `kableExtra` for styling tables from dataframes
 
@@ -763,14 +763,17 @@ multi_network <- multi_graph %>%
   )
 
 multi_network
-```
-:::
+```  
 
+:::
+  
+  
 ::: {.alertbox .alert data-latex="alert"}
 **Initial Insights from Visualisations:**
 
 -   The networks of **Multi-industry & Consumer Goods** feature Ultimate Beneficial Owners, as well as multiple companies with large numbers of shareholders within the network structure
 -   There are many single-linked connections within the network structures, which suggests that the missing 'links' are filled with connections to companies in other industries.
+
 :::
 
 # Quantifying Network Similarity
@@ -918,6 +921,21 @@ Similarities in Network structure can be derived from both Jaccard Similarity (J
 
 # A *Fishy* Network?
 
+Many of the 'groups' of companies by industry had high jaccard similarity and Orbit Distribution scores, which suggests that there is a significant overlap in the connections and relationships between companies, owners, and contacts involved in the overall network between industries. These network diagrams are visualised to compare the graphlet structures within the expanded networks, to determine if there are *fishy* ties between entities across industries.  
+
+In particular, networks with **high Jaccard similarity** could indicate:  
+
+  - Collaboration and Cooperation between industries
+  - Cross-Industry Syndicates that span across multiple industries, coordinating illegal fishing activities and exploiting resources collectively.
+  - Common entities who benefit from illegal fishing practices  
+  
+A **high Orbit Distribution Agreement** could also suggest:
+
+  - Common Network Dynamics or organizational structures. This could involve shared roles, relationships, or coordination mechanisms among key actors involved in illegal fishing.
+  - Coordinated Activities between industries  
+  
+As such, the following subgroups of networks are visualised for further comparison: 
+
 ## Industrial, Fishing-related and Seafood-processing Companies
 
 ```{r}
@@ -976,11 +994,11 @@ net5 <-
             shape = "icon",
             icon = list(code = "f21a",
                         size = 45,
-                        color = "#629DBB")) %>%
+                        color = "#52DFD6")) %>%
   visGroups(groupname = "Ultimate Beneficial Owner",
             color = "#D86171") %>% 
   visGroups(groupname = "Shareholder",
-            color = "#163759") %>% 
+            color = "#247EBF") %>% 
   visGroups(groupname = "Company Contact",
             color = "#F39C12") %>% 
   visGroups(groupname = "Multi-role Entity",
@@ -1010,7 +1028,7 @@ nodes_fishy2 <- nodes_industry %>%
 
 # Overall links
 links_fishy2 <- mc3_links_new %>%
-  filter(source %in% nodes_fishy$id)
+  filter(source %in% nodes_fishy2$id)
 
 # Overall nodes from links data
 links_fishy2_source <- links_fishy2 %>%
@@ -1045,25 +1063,20 @@ net6 <-
   visIgraphLayout(
     layout = "layout_with_fr"
   ) %>%
-  visGroups(groupname = "Industrial Company",
+  visGroups(groupname = "Consumer-goods Company",
             shape = "icon",
-            icon = list(code = "f013",
+            icon = list(code = "f291",
                         size = 45,
-                        color = "#51585D")) %>%
-  visGroups(groupname = "Seafood-processing Company",
+                        color = "#138D75")) %>%
+  visGroups(groupname = "Transport-logistics Company",
             shape = "icon",
-            icon = list(code = "f578",
+            icon = list(code = "f4df",
                         size = 45,
-                        color = "#B78EA4")) %>%
-  visGroups(groupname = "Fishing-related Company",
-            shape = "icon",
-            icon = list(code = "f21a",
-                        size = 45,
-                        color = "#629DBB")) %>%
+                        color = "#85929E")) %>%
   visGroups(groupname = "Ultimate Beneficial Owner",
             color = "#D86171") %>% 
   visGroups(groupname = "Shareholder",
-            color = "#163759") %>% 
+            color = "#247EBF") %>% 
   visGroups(groupname = "Company Contact",
             color = "#F39C12") %>% 
   visGroups(groupname = "Multi-role Entity",
@@ -1082,4 +1095,99 @@ net6 <-
   visInteraction(navigationButtons = TRUE)
 
 net6
+```  
+
+
+## Fishing-related and Transport-logistics Industries
+
+```{r}
+# Consumer Goods and Transport Industries
+nodes_fishy3 <- nodes_industry %>%
+  filter(group =="Fishing-related Company" | group =="Transport-logistics Company")
+
+# Overall links
+links_fishy3 <- mc3_links_new %>%
+  filter(source %in% nodes_fishy3$id)
+
+# Overall nodes from links data
+links_fishy3_source <- links_fishy3 %>%
+  distinct(source) %>%
+  rename("id" = "source")
+
+links_fishy3_target <- links_fishy3 %>%
+  distinct(target) %>%
+  rename("id" = "target")
+
+# Overall Companies
+nodes_fishy3_new <- bind_rows(links_fishy3_source, links_fishy3_target) %>%
+  left_join(mc3_nodes_all, by = "id") %>%
+  select(id, group, revenue_group, transboundary)
+
+links_fishy3_new <- links_fishy3 %>%
+  rename("from" = "source",
+         "to" = "target")
 ```
+
+```{r}
+net7 <-
+  visNetwork(
+    nodes_fishy3_new, 
+    links_fishy3_new,
+    width = "100%",
+    main = list(text = "Fishing-related and Transport-logistics Networks",
+                style = "font-size:17x;
+                weight:bold;
+                text-align:right;")
+  ) %>%
+  visIgraphLayout(
+    layout = "layout_with_fr"
+  ) %>%
+  visGroups(groupname = "Fishing-related Company",
+            shape = "icon",
+            icon = list(code = "f21a",
+                        size = 45,
+                        color = "#52DFD6")) %>%
+  visGroups(groupname = "Transport-logistics Company",
+            shape = "icon",
+            icon = list(code = "f48b",
+                        size = 45,
+                        color = "#85929E")) %>%
+  visGroups(groupname = "Ultimate Beneficial Owner",
+            color = "#D86171") %>% 
+  visGroups(groupname = "Shareholder",
+            color = "#247EBF") %>% 
+  visGroups(groupname = "Company Contact",
+            color = "#F39C12") %>% 
+  visGroups(groupname = "Multi-role Entity",
+            color = "#48C9B0") %>% 
+  visLegend() %>%
+  visEdges() %>%
+  addFontAwesome() %>%
+  visOptions(
+  # Specify additional Interactive Elements
+    highlightNearest = list(enabled = T, degree = 2, hover = T),
+  # Add drop-down menu to filter by company name
+    nodesIdSelection = TRUE,
+  # Add drop-down menu to filter by category
+    selectedBy = "group",
+    collapse = TRUE) %>%
+  visInteraction(navigationButtons = TRUE)
+
+net7
+```  
+.  
+.
+
+From the analysis thus far, we can surmise that **anomalous company structures** may be derived from inter-industry networks, understanding any underlying links between companies as well as looking for overlapping ownership structures. Separate graphlets (clusters) within the network that are linked by entities could suggest possible **joint ventures** -- this is most apparent in the Industrial, Fishing and Seafood-processing network, where several pairs of companies (of different industries and sub-clusters) are linked by one or more entities. These companies are:  
+
+- **SeaSolutions Leska Kga Worldwide (Seafood-processing) & Karelians Plc Marine conservation (Industrial), linked by John Williams (Multi-role Entity)**
+
+- **Aqua Aura SE Marine life (Fishing-related) & Irish Mackeral S.A. de C.V. Marine Biology (Seafood-processing), linked by Dale Rhodes & Cynthia Murphy (Shareholders) and Leah Criz & Jilian White (Company contacts)**
+
+- **Seashell Sanctum Co Family (Industrial) & Khundu N V and Son's (Seafood-processing) linked by Amy Martinez (Shareholder)**
+
+- **Adriatic Tuna Seabass BV Transit (Fishing-related) & Fisher Marine Conservation CJSC Transportation (Industrial), linked by Mathew Mora (Shareholder)**
+  
+Of particular interest is the fact that in almost all of these flagged pairs of linked companies, one of the companies have a company name that suggests involvement in the study of marine biology or conservation efforts: Karelians Plc Marine conservation, Irish Mackeral S.A. de C.V. Marine Biology, etc. This is particularly *fishy*, and reminiscent of the case study on Japanese Whaling industry, where Japanese whalers hunt whales under the guise of 'scientific research', [exploiting a loophole in International Whaling Commission (IWC) rules](https://uk.whales.org/our-4-goals/stop-whaling/whaling-in-japan/), which allows whaling for conservation research purposes. Similarly, these *fishy* structures could be hiding IUU activity under the guise of reasearch or conservation efforts. 
+
+
